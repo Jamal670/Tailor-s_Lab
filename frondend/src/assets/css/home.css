@@ -385,6 +385,13 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 3rem;
 }
 
+.features-slider-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
 .features-slider {
   position: relative;
   width: 100%;
@@ -395,6 +402,41 @@ h1, h2, h3, h4, h5, h6 {
   -ms-overflow-style: none; /* IE and Edge */
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   scroll-behavior: smooth; /* Smooth scrolling on modern browsers */
+}
+
+.slider-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 2px solid var(--text-color);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.slider-nav-btn:hover {
+  background-color: var(--text-color);
+  color: var(--primary-color);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.slider-nav-left {
+  left: 10px;
+}
+
+.slider-nav-right {
+  right: 10px;
 }
 
 .features-slider::-webkit-scrollbar {
@@ -789,6 +831,20 @@ h1, h2, h3, h4, h5, h6 {
     flex: 0 0 280px;
     height: 380px;
   }
+
+  .slider-nav-btn {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
+
+  .slider-nav-left {
+    left: 5px;
+  }
+
+  .slider-nav-right {
+    right: 5px;
+  }
 }
 
 @media (max-width: 991px) {
@@ -965,6 +1021,20 @@ h1, h2, h3, h4, h5, h6 {
     width: 35px;
     height: 35px;
   }
+
+  .slider-nav-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .slider-nav-left {
+    left: 5px;
+  }
+
+  .slider-nav-right {
+    right: 5px;
+  }
   
   .why-us-section .section-title {
     font-size: 2.5rem;
@@ -1064,6 +1134,20 @@ h1, h2, h3, h4, h5, h6 {
     width: 30px;
     height: 30px;
     font-size: 0.8rem;
+  }
+
+  .slider-nav-btn {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
+  }
+
+  .slider-nav-left {
+    left: 2px;
+  }
+
+  .slider-nav-right {
+    right: 2px;
   }
   
   .why-us-section .section-title {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { BsCart2 } from 'react-icons/bs';
@@ -7,13 +7,75 @@ import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import Header from '../../components/headers/Header';
 import Footer from '../../components/footers/Footer';
 import { useNavigate } from 'react-router-dom';
+import api from '../../Api';
 import '../../assets/css/suitCategory.css';
 
 const SuitCategoryPage = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 3;
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState({
+    totalPages: 1,
+    totalProducts: 0,
+    currentPage: 1
+  });
+  const [selectedColors, setSelectedColors] = useState([]);
+  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [selectedPriceRange, setSelectedPriceRange] = useState('');
+
+  const colorOptions = ['Black', 'Brown', 'Navy', 'Gray', 'White', 'Blue'];
+  const sizeOptions = ['XS', 'S', 'M', 'L', 'XL'];
+  const priceOptions = [
+    { label: '$0 - $300', value: '0-300' },
+    { label: '$300 - $500', value: '300-500' },
+    { label: '$500+', value: '500+' }
+  ];
+
+  // Fetch products when page changes
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const hasFilters = selectedColors.length > 0 || selectedSizes.length > 0 || selectedPriceRange;
+        let response;
+
+        if (hasFilters) {
+          const params = new URLSearchParams();
+          params.append('category', 'suits');
+          params.append('page', currentPage);
+          if (selectedColors.length) params.append('colors', selectedColors.join(','));
+          if (selectedSizes.length) params.append('sizes', selectedSizes.join(','));
+          if (selectedPriceRange) params.append('priceRange', selectedPriceRange);
+          response = await api.get(`/user/filter-products?${params.toString()}`);
+        } else {
+          response = await api.get(`/user/get-suits-products?page=${currentPage}`);
+        }
+
+        setProducts(response.data.products || []);
+        setPagination(
+          response.data.pagination || {
+            totalPages: 1,
+            totalProducts: 0,
+            currentPage: 1
+          }
+        );
+      } catch (error) {
+        console.error('Error fetching suits products:', error);
+        setProducts([]);
+        setPagination({
+          totalPages: 1,
+          totalProducts: 0,
+          currentPage: 1
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [currentPage, selectedColors, selectedSizes, selectedPriceRange]);
 
   const toggleFilter = () => {
     setActiveFilter(!activeFilter);
@@ -21,102 +83,49 @@ const SuitCategoryPage = () => {
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
-    // Scroll to top of products section when changing pages
-    document.querySelector('.product-display-section').scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => {
+      const section = document.querySelector('.product-display-section');
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
   };
 
-  const products = [
-    {
-      id: 1,
-      title: "Chocolate Brown Cotton Suit",
-      price: "$340.00",
-      image: "/images/feature.png",
-      description: "Crafted in premium breathable cotton, this chocolate brown suit is where timeless sophistication meets everyday comfort."
-    },
-    {
-      id: 2,
-      title: "Navy Blue Wool Suit",
-      price: "$420.00",
-      image: "/images/feature.png",
-      description: "Exceptional durability and refined drape, perfect for formal occasions and business meetings alike."
-    },
-    {
-      id: 3,
-      title: "Charcoal Grey Linen Suit",
-      price: "$380.00",
-      image: "/images/feature.png",
-      description: "Lightweight comfort with sophisticated style, ideal for warm-weather formal events."
-    },
-    {
-      id: 4,
-      title: "Black Pinstripe Suit",
-      price: "$450.00",
-      image: "/images/feature.png",
-      description: "Classic elegance with a modern twist, featuring subtle pinstripes for a distinguished professional look."
-    },
-    {
-      id: 5,
-      title: "Light Grey Summer Suit",
-      price: "$320.00",
-      image: "/images/feature.png",
-      description: "Breathable and lightweight fabric perfect for summer events and outdoor ceremonies."
-    },
-    {
-      id: 6,
-      title: "Burgundy Velvet Suit",
-      price: "$480.00",
-      image: "/images/feature.png",
-      description: "Rich velvet texture in a bold burgundy shade, designed for special occasions and evening events."
-    },
-    {
-      id: 7,
-      title: "Olive Green Suit",
-      price: "$390.00",
-      image: "/images/feature.png",
-      description: "Unique olive green hue that stands out while maintaining sophistication and versatility."
-    },
-    {
-      id: 8,
-      title: "Royal Blue Suit",
-      price: "$410.00",
-      image: "/images/feature.png",
-      description: "Vibrant royal blue that makes a statement while maintaining professional elegance."
-    },
-    {
-      id: 9,
-      title: "Tan Linen Blend Suit",
-      price: "$360.00",
-      image: "/images/feature.png",
-      description: "Perfect for destination weddings and summer events with its breathable linen blend fabric."
-    },
-    {
-      id: 10,
-      title: "Midnight Black Tuxedo",
-      price: "$520.00",
-      image: "/images/feature.png",
-      description: "Timeless black tuxedo with satin details, designed for formal black-tie events."
-    },
-    {
-      id: 11,
-      title: "Slate Grey Suit",
-      price: "$400.00",
-      image: "/images/feature.png",
-      description: "Versatile slate grey that transitions seamlessly from day to evening events."
-    },
-    {
-      id: 12,
-      title: "Cream Summer Suit",
-      price: "$370.00",
-      image: "/images/feature.png",
-      description: "Elegant cream suit perfect for summer garden parties and outdoor celebrations."
-    }
-  ];
+  const handleColorToggle = (color) => {
+    setSelectedColors((prev) =>
+      prev.includes(color) ? prev.filter((item) => item !== color) : [...prev, color]
+    );
+    setCurrentPage(1);
+  };
 
-  // Calculate pagination
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
-  const totalPages = Math.ceil(products.length / productsPerPage);
+  const handleSizeToggle = (size) => {
+    setSelectedSizes((prev) =>
+      prev.includes(size) ? prev.filter((item) => item !== size) : [...prev, size]
+    );
+    setCurrentPage(1);
+  };
+
+  const handlePriceSelect = (range) => {
+    setSelectedPriceRange((prev) => (prev === range ? '' : range));
+    setCurrentPage(1);
+  };
+
+  const clearFilters = () => {
+    setSelectedColors([]);
+    setSelectedSizes([]);
+    setSelectedPriceRange('');
+    setCurrentPage(1);
+  };
+
+  const filtersApplied =
+    selectedColors.length > 0 || selectedSizes.length > 0 || selectedPriceRange;
+
+  // Get image URL helper
+  const getImageUrl = (imageUrl) => {
+    if (!imageUrl) return "/images/feature.png";
+    const apiBase = import.meta.env.VITE_API_URL?.replace(/\/$/, '');
+    return apiBase ? `${apiBase}/uploads/${imageUrl}` : `/uploads/${imageUrl}`;
+  };
 
   return (
     <div className="suit-category-wrapper">
@@ -181,73 +190,60 @@ const SuitCategoryPage = () => {
                     <div className="filter-group">
                       <h5>Color</h5>
                       <div className="filter-options">
-                        <label className="filter-option">
-                          <input type="checkbox" name="color" value="black" />
-                          <span className="checkmark"></span>
-                          Black
-                        </label>
-                        <label className="filter-option">
-                          <input type="checkbox" name="color" value="brown" />
-                          <span className="checkmark"></span>
-                          Brown
-                        </label>
-                        <label className="filter-option">
-                          <input type="checkbox" name="color" value="navy" />
-                          <span className="checkmark"></span>
-                          Navy
-                        </label>
-                        <label className="filter-option">
-                          <input type="checkbox" name="color" value="gray" />
-                          <span className="checkmark"></span>
-                          Gray
-                        </label>
+                        {colorOptions.map((color) => (
+                          <label className="filter-option" key={color}>
+                            <input
+                              type="checkbox"
+                              checked={selectedColors.includes(color)}
+                              onChange={() => handleColorToggle(color)}
+                            />
+                            <span className="checkmark"></span>
+                            {color}
+                          </label>
+                        ))}
                       </div>
                     </div>
 
                     <div className="filter-group">
-                      <h5>Material</h5>
+                      <h5>Size</h5>
                       <div className="filter-options">
-                        <label className="filter-option">
-                          <input type="checkbox" name="material" value="cotton" />
-                          <span className="checkmark"></span>
-                          Cotton
-                        </label>
-                        <label className="filter-option">
-                          <input type="checkbox" name="material" value="wool" />
-                          <span className="checkmark"></span>
-                          Wool
-                        </label>
-                        <label className="filter-option">
-                          <input type="checkbox" name="material" value="linen" />
-                          <span className="checkmark"></span>
-                          Linen
-                        </label>
+                        {sizeOptions.map((size) => (
+                          <label className="filter-option" key={size}>
+                            <input
+                              type="checkbox"
+                              checked={selectedSizes.includes(size)}
+                              onChange={() => handleSizeToggle(size)}
+                            />
+                            <span className="checkmark"></span>
+                            {size}
+                          </label>
+                        ))}
                       </div>
                     </div>
 
                     <div className="filter-group">
                       <h5>Price Range</h5>
                       <div className="filter-options">
-                        <label className="filter-option">
-                          <input type="checkbox" name="price" value="0-300" />
-                          <span className="checkmark"></span>
-                          $0 - $300
-                        </label>
-                        <label className="filter-option">
-                          <input type="checkbox" name="price" value="300-500" />
-                          <span className="checkmark"></span>
-                          $300 - $500
-                        </label>
-                        <label className="filter-option">
-                          <input type="checkbox" name="price" value="500+" />
-                          <span className="checkmark"></span>
-                          $500+
-                        </label>
+                        {priceOptions.map((option) => (
+                          <label className="filter-option" key={option.value}>
+                            <input
+                              type="checkbox"
+                              checked={selectedPriceRange === option.value}
+                              onChange={() => handlePriceSelect(option.value)}
+                            />
+                            <span className="checkmark"></span>
+                            {option.label}
+                          </label>
+                        ))}
                       </div>
                     </div>
                   </div>
 
-                  <Button variant="dark" className="apply-filter-btn">Apply Filters</Button>
+                  {filtersApplied && (
+                    <Button variant="dark" className="apply-filter-btn" onClick={clearFilters}>
+                      Clear Filters
+                    </Button>
+                  )}
                 </div>
               </Col>
             </Row>
@@ -256,65 +252,79 @@ const SuitCategoryPage = () => {
           {/* Product Display */}
           <Row className="justify-content-center">
             <Col xs={12}>
-              <div className="product-container">
-                {currentProducts.map(product => (
-                  <div className="product-card" key={product.id}>
-                    <div className="product-images">
-                      <img src={product.image} alt={product.title} />
-                    </div>
-                    <div className="product-details-container">
-                      <h2 className="product-title">{product.title}</h2>
-                      <div className="product-prices">{product.price}</div>
-                      <div className="product-description">
-                        <p>{product.description}</p>
+              {loading ? (
+                <div style={{ textAlign: 'center', color: '#E2D9C8', padding: '2rem' }}>
+                  Loading products...
+                </div>
+              ) : products.length === 0 ? (
+                <div style={{ textAlign: 'center', color: '#E2D9C8', padding: '2rem' }}>
+                  No products available
+                </div>
+              ) : (
+                <div className="product-container">
+                  {products.map(product => (
+                    <div className="product-card" key={product.product_id}>
+                      <div className="product-images">
+                        <img src={getImageUrl(product.image_url)} alt={product.name} />
                       </div>
-                      <Button variant="dark" className="shop-now-btn" onClick={() => navigate(`/product`)}>
-                        <BsCart2 className="cart-icon" /> Shop Now
-                      </Button>
+                      <div className="product-details-container">
+                        <h2 className="product-title">{product.name}</h2>
+                        <div className="product-prices">
+                          ${typeof product.price === 'number' ? Number(product.price).toFixed(2) : product.price}
+                        </div>
+                        <div className="product-description">
+                          <p>{product.description1 || 'No description available'}</p>
+                        </div>
+                        <Button variant="dark" className="shop-now-btn" onClick={() => navigate(`/product/${product.product_id}`)}>
+                          <BsCart2 className="cart-icon" /> Shop Now
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </Col>
           </Row>
         </Container>
       </section>
 
       {/* Pagination Navigator */}
-      <section className="pagination-section">
-        <div className="pagination-container">
-          <button
-            className="pagination-arrow"
-            onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            <IoIosArrowBack />
-          </button>
+      {!loading && pagination.totalPages > 0 && (
+        <section className="pagination-section">
+          <div className="pagination-container">
+            <button
+              className="pagination-arrow"
+              onClick={() => pagination.currentPage > 1 && handlePageChange(pagination.currentPage - 1)}
+              disabled={pagination.currentPage === 1}
+            >
+              <IoIosArrowBack />
+            </button>
 
-          {[...Array(totalPages)].map((_, index) => {
-            const pageNumber = index + 1;
-            // Format page number to have leading zero for single digits
-            const formattedPageNumber = pageNumber < 10 ? `0${pageNumber}` : pageNumber;
-            return (
-              <button
-                key={pageNumber}
-                className={`pagination-number ${currentPage === pageNumber ? 'active' : ''}`}
-                onClick={() => handlePageChange(pageNumber)}
-              >
-                {formattedPageNumber}
-              </button>
-            );
-          })}
+            {[...Array(pagination.totalPages)].map((_, index) => {
+              const pageNumber = index + 1;
+              // Format page number to have leading zero for single digits
+              const formattedPageNumber = pageNumber < 10 ? `0${pageNumber}` : pageNumber;
+              return (
+                <button
+                  key={pageNumber}
+                  className={`pagination-number ${pagination.currentPage === pageNumber ? 'active' : ''}`}
+                  onClick={() => handlePageChange(pageNumber)}
+                >
+                  {formattedPageNumber}
+                </button>
+              );
+            })}
 
-          <button
-            className="pagination-arrow"
-            onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            <IoIosArrowForward />
-          </button>
-        </div>
-      </section>
+            <button
+              className="pagination-arrow"
+              onClick={() => pagination.currentPage < pagination.totalPages && handlePageChange(pagination.currentPage + 1)}
+              disabled={pagination.currentPage === pagination.totalPages}
+            >
+              <IoIosArrowForward />
+            </button>
+          </div>
+        </section>
+      )}
 
       {/* Footer Component */}
       <Footer />

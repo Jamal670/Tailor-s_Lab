@@ -119,6 +119,19 @@ body::before {
   align-items: center;
 }
 
+.product-details-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.product-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
+}
+
 .remove-product {
   background: none;
   border: none;
@@ -143,7 +156,25 @@ body::before {
 }
 
 .product-name {
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+.product-inline-price {
+  font-weight: 600;
+  color: var(--text-color);
+  font-size: 1rem;
+}
+
+.product-category {
+  color: var(--light-text);
+  font-size: 0.9rem;
+}
+
+.product-variants {
+  color: var(--light-text);
+  font-size: 0.9rem;
 }
 
 .quantity-selector {
@@ -157,7 +188,7 @@ body::before {
 .quantity-btn {
   background: none;
   border: none;
-  color: var(--text-color);
+  color: #ffffff;
   font-size: 1rem;
   cursor: pointer;
   padding: 5px 10px;
@@ -170,6 +201,7 @@ body::before {
   padding: 0 10px;
   min-width: 30px;
   text-align: center;
+  color: #ffffff;
 }
 
 /* Coupon Code */

@@ -278,6 +278,12 @@
   color: #666;
 }
 
+.order-error {
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  color: #e63946;
+}
+
 .place-order-btn {
   width: 100%;
   padding: 15px;

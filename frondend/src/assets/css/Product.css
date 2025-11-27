@@ -254,6 +254,18 @@ body::before {
   background-color: #8b2e2e;
 }
 
+.color-btn.black {
+  background-color: #000000;
+}
+
+.color-btn.brown {
+  background-color: #8B4513;
+}
+
+.color-btn.gray {
+  background-color: #808080;
+}
+
 .quantity-cart-section {
   display: flex;
   margin-top: 15px;
@@ -470,17 +482,26 @@ body::before {
   color: var(--primary-text);
   margin-bottom: 20px;
   font-weight: normal;
+  text-align: center;
 }
 
 .description-content-wrapper {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 40px;
+  min-height: 300px;
 }
 
 .description-text {
   flex: 1;
-  padding-right: 20px;
+  padding-right: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100%;
 }
 
 .description-text p {
@@ -488,25 +509,33 @@ body::before {
   font-size: 0.95rem;
   line-height: 1.8;
   color: var(--secondary-text);
+  margin: 0;
+  max-width: 500px;
 }
 
 .description-images {
   flex: 1;
   display: flex;
   gap: 15px;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
 }
 
 .description-image {
-  width: 48%;
-  height: 200px;
-  border-radius: var(--border-radius-sm);
+  width: 200px;
+  height: 300px;
+  border-radius: 10px;
   overflow: hidden;
+  border: 1px solid var(--border-color);
+  flex-shrink: 0;
 }
 
 .description-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
 }
 
 .description-details {
@@ -536,6 +565,114 @@ body::before {
   content: '';
   position: absolute;
   bottom: -15px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: var(--border-color);
+}
+
+/* Row 2 Styles */
+.description-row-2 {
+  margin-top: 40px;
+  align-items: flex-start;
+  display: flex;
+}
+
+/* Mobile Only Row 2 - Details Section */
+.mobile-row-2-details {
+  display: none;
+  margin-top: 40px;
+}
+
+.mobile-description-details {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  padding: 20px 0;
+}
+
+/* Left Column: Description Box */
+.description-box-column {
+  padding-right: 20px;
+}
+
+.description-box-container {
+  border-radius: var(--border-radius-md);
+  padding: 30px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.description-box-text {
+  width: 100%;
+}
+
+.description-box-text p {
+  font-family: var(--body-font);
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--secondary-text);
+  margin: 0;
+}
+
+/* Right Column: Image with Details */
+.description-image-details-column {
+  padding-left: 20px;
+}
+
+.image-details-wrapper {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  height: 100%;
+}
+
+.row-2-product-image {
+  flex: 0 0 200px;
+  height: 300px;
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.row-2-product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.row-2-description-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  padding-top: 10px;
+}
+
+.description-detail-item {
+  position: relative;
+}
+
+.description-detail-item h3 {
+  font-family: 'Montserrat', serif;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: var(--primary-text);
+}
+
+.description-detail-item p {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--secondary-text);
+  margin: 0;
+}
+
+.description-detail-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
   left: 0;
   width: 100%;
   height: 1px;
@@ -900,15 +1037,59 @@ body::before {
 
   .description-content-wrapper {
     flex-direction: column;
+    min-height: auto;
+    align-items: center;
   }
 
   .description-text {
     padding-right: 0;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    text-align: center;
   }
 
   .description-images {
     justify-content: center;
+    width: 100%;
+    height: auto;
+    flex-wrap: wrap;
+  }
+
+  .description-image {
+    width: 200px;
+    height: 300px;
+  }
+
+  /* Row 2 Responsive - Tablet */
+  .description-row-2 {
+    flex-direction: column;
+  }
+
+  .description-box-column,
+  .description-image-details-column {
+    padding-left: 0;
+    padding-right: 0;
+    margin-bottom: 30px;
+  }
+
+  .image-details-wrapper {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .row-2-product-image {
+    width: 100%;
+    flex: none;
+    height: 250px;
+  }
+
+  /* Hide mobile-only section on tablet */
+  .mobile-row-2-details {
+    display: none;
+  }
+
+  /* Show desktop Row 2 on tablet */
+  .desktop-row-2 {
+    display: flex;
   }
   
   .review-text {
@@ -1030,6 +1211,9 @@ body::before {
   .product-main-image {
     height: 350px;
   }
+  .product-main-image img {
+    height: 350px;
+  }
 
   .product-title {
     font-size: 1.5rem;
@@ -1116,11 +1300,73 @@ body::before {
   
   .description-images {
     flex-direction: column;
+    gap: 20px;
+    align-items: center;
   }
   
   .description-image {
+    width: 200px;
+    height: 300px;
+    margin-bottom: 0;
+  }
+
+  .description-content-wrapper {
+    min-height: auto;
+  }
+
+  /* Row 2 Mobile - Hide desktop version, show mobile-only details */
+  .desktop-row-2 {
+    display: none !important;
+  }
+
+  .mobile-row-2-details {
+    display: block;
+  }
+
+  .mobile-description-details {
+    padding: 20px 0;
+  }
+
+  .mobile-description-details .description-detail-item h3 {
+    font-family: 'Montserrat', serif;
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+    color: var(--primary-text);
+  }
+
+  .mobile-description-details .description-detail-item p {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--secondary-text);
+    margin: 0;
+  }
+
+  .mobile-description-details .description-detail-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 0;
     width: 100%;
-    margin-bottom: 15px;
+    height: 1px;
+    background-color: var(--border-color);
+  }
+
+  /* Row 2 Mobile */
+  .description-box-container {
+    padding: 20px;
+  }
+
+  .row-2-product-image {
+    height: 200px;
+  }
+
+  .row-2-description-details {
+    gap: 20px;
+  }
+
+  .description-detail-item h3 {
+    font-size: 1.2rem;
   }
   
   .additional-info-item {
@@ -1153,3 +1399,8 @@ body::before {
     margin-top: 10px;
   }
 }
+
+
+
+
+

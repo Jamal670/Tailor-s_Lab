@@ -1,30 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import { IoRemoveOutline, IoAddOutline } from 'react-icons/io5';
+import { Link } from 'react-router-dom';
 import Header from '../../components/headers/Header';
 import Footer from '../../components/footers/Footer';
 import '../../assets/css/checkout.css';
+import { 
+  getCartItems, 
+  getCartTotal, 
+  removeFromCart, 
+  updateCartItemQuantity 
+} from '../../utils/cartUtils';
+import { formatColorLabel } from '../../utils/colorUtils';
 
 const Checkout = () => {
-  const [quantity, setQuantity] = useState(1);
+  const [cartItems, setCartItems] = useState([]);
   const [couponCode, setCouponCode] = useState('');
   const [shippingMethod, setShippingMethod] = useState('free');
-  
-  // Sample product data
-  const product = {
-    name: "White Colored Trouser",
-    price: 340.00,
-    image: "/images/Trouser.png"
-  };
 
-  const decreaseQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1);
+  useEffect(() => {
+    const items = getCartItems();
+    setCartItems(items);
+  }, []);
+
+  const handleQuantityChange = (index, newQuantity) => {
+    const item = cartItems[index];
+    if (!item) return;
+
+    const maxQty = Number(item.maxQuantity);
+    const resolvedMax = Number.isFinite(maxQty) && maxQty > 0 ? maxQty : null;
+    let nextQuantity = Math.max(1, newQuantity);
+
+    if (resolvedMax && nextQuantity > resolvedMax) {
+      nextQuantity = resolvedMax;
+      alert(`Only ${resolvedMax} unit(s) available for ${item.name}.`);
     }
+
+    const updatedItems = updateCartItemQuantity(index, nextQuantity);
+    setCartItems([...updatedItems]);
   };
 
-  const increaseQuantity = () => {
-    setQuantity(quantity + 1);
+  const handleRemoveItem = (index) => {
+    const updatedItems = removeFromCart(index);
+    setCartItems([...updatedItems]);
   };
 
   const handleCouponChange = (e) => {
@@ -41,9 +59,25 @@ const Checkout = () => {
   };
 
   // Calculate totals
-  const subtotal = product.price * quantity;
+  const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   const shippingCost = shippingMethod === 'flat' ? 12.00 : 0;
   const total = subtotal + shippingCost;
+
+  const getImageUrl = (imageUrl) => {
+    if (!imageUrl) return "/images/feature.png";
+    const apiBase = import.meta.env.VITE_API_URL?.replace(/\/$/, '');
+    return apiBase ? `${apiBase}/uploads/${imageUrl}` : `/uploads/${imageUrl}`;
+  };
+
+  const getDisplayColor = (item) => {
+    if (item.color) {
+      return formatColorLabel(item.color);
+    }
+    if (item.color_hex) {
+      return formatColorLabel(item.color_hex);
+    }
+    return 'N/A';
+  };
 
   return (
     <div className="checkout-wrapper">
@@ -87,30 +121,67 @@ const Checkout = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="product-row">
-                      <td className="product-col">
-                        <div className="product-info">
-                          <button className="remove-product">×</button>
-                          <div className="product-image">
-                            <img src={product.image} alt={product.name} />
-                          </div>
-                          <div className="product-name">{product.name}</div>
-                        </div>
-                      </td>
-                      <td className="price-col">${product.price.toFixed(2)}</td>
-                      <td className="quantity-col">
-                        <div className="quantity-selector">
-                          <button className="quantity-btn" onClick={decreaseQuantity}>
-                            <IoRemoveOutline />
-                          </button>
-                          <span className="quantity-value">{quantity}</span>
-                          <button className="quantity-btn" onClick={increaseQuantity}>
-                            <IoAddOutline />
-                          </button>
-                        </div>
-                      </td>
-                      <td className="subtotal-col">${subtotal.toFixed(2)}</td>
-                    </tr>
+                    {cartItems.length === 0 ? (
+                      <tr>
+                        <td colSpan="4" className="empty-cart-row">Your cart is empty</td>
+                      </tr>
+                    ) : (
+                      cartItems.map((item, index) => (
+                        <tr className="product-row" key={index}>
+                          <td className="product-col">
+                            <div className="product-info">
+                              <button className="remove-product" onClick={() => handleRemoveItem(index)}>×</button>
+                              <div className="product-image">
+                                <img src={getImageUrl(item.image_url)} alt={item.name} />
+                              </div>
+                              <div className="product-details-block">
+                                <div className="product-name">
+                                  {item.product_id ? (
+                                    <Link
+                                      to={`/product/${item.product_id}`}
+                                      style={{ color: 'inherit', textDecoration: 'none' }}
+                                    >
+                                      {item.name}
+                                    </Link>
+                                  ) : (
+                                    item.name
+                                  )}
+                                </div>
+                                {(item.size || item.color) && (
+                                  <div className="product-variants">
+                                    {item.size && <span>Size: {item.size}</span>}
+                                    {item.size && item.color && <span> • </span>}
+                                    {(item.color || item.color_hex) && (
+                                      <span>Color: {getDisplayColor(item)}</span>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="price-col">${Number(item.price).toFixed(2)}</td>
+                          <td className="quantity-col">
+                            <div className="quantity-selector" style={{ border: '1px solid #E2D9C8' }}>
+                              <button 
+                                className="quantity-btn" style={{ border: '1px solid #E2D9C8', color: '#E2D9C8' }}  
+                                onClick={() => handleQuantityChange(index, item.quantity - 1)}
+                                disabled={item.quantity <= 1}
+                              >
+                                <IoRemoveOutline />
+                              </button>
+                              <span className="quantity-value">{item.quantity}</span>
+                              <button 
+                                className="quantity-btn " style={{ border: '1px solid #E2D9C8', color: '#E2D9C8' }}  
+                                onClick={() => handleQuantityChange(index, item.quantity + 1)}
+                              >
+                                <IoAddOutline />
+                              </button>
+                            </div>
+                          </td>
+                          <td className="subtotal-col">${(item.price * item.quantity).toFixed(2)}</td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>

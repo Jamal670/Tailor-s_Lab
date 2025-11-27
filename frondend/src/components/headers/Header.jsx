@@ -1,28 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container } from 'react-bootstrap';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { IoBag } from "react-icons/io5";
 import '../../assets/css/header.css';
 import Cart from '../cart/Cart';
+import { getCartItems } from '../../utils/cartUtils';
 
 const Header = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Sample cart items for demonstration
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Active-T-Shirt - Black, M",
-      image: "/images/Trouser.png",
-      price: 18.00,
-      quantity: 1
+  // Load cart items from localStorage on mount and when cart opens
+  useEffect(() => {
+    const loadCartItems = () => {
+      const items = getCartItems();
+      setCartItems(items);
+    };
+
+    loadCartItems();
+    
+    // Listen for storage events to update cart when changed in other tabs
+    window.addEventListener('storage', loadCartItems);
+    
+    // Custom event for same-tab updates
+    window.addEventListener('cartUpdated', loadCartItems);
+
+    return () => {
+      window.removeEventListener('storage', loadCartItems);
+      window.removeEventListener('cartUpdated', loadCartItems);
+    };
+  }, []);
+
+  // Reload cart when cart opens
+  useEffect(() => {
+    if (isCartOpen) {
+      const items = getCartItems();
+      setCartItems(items);
     }
-  ]);
+  }, [isCartOpen]);
 
   const toggleCart = () => {
     setIsCartOpen(!isCartOpen);
+  };
+
+  const handleCartUpdate = () => {
+    const items = getCartItems();
+    setCartItems(items);
   };
 
   const handleCollectionClick = (e) => {
@@ -67,7 +92,7 @@ const Header = () => {
       </Container>
       
       {/* Cart sidebar */}
-      <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} cartItems={cartItems} />
+      <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} cartItems={cartItems} onCartUpdate={handleCartUpdate} />
       
       {/* Overlay when cart is open */}
       <div 

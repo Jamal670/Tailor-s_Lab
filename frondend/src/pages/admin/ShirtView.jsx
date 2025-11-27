@@ -1,34 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container } from 'react-bootstrap';
 import { FaTrash, FaEdit, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import '../../assets/css/admin/ShirtView.css';
+import api from '../../Api';
 
 const ShirtView = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('Suits');
-  
-  // Sample data for suits
-  const suitsData = [
-    { id: 1, name: 'Chocolate Brown Cotton Suit', price: '$340.00', quantity: 10 },
-    { id: 2, name: 'Classic Black Wool Suit', price: '$420.00', quantity: 15 },
-    { id: 3, name: 'Navy Blue Pinstripe Suit', price: '$380.00', quantity: 8 },
-    { id: 4, name: 'Gray Herringbone Suit', price: '$390.00', quantity: 12 },
-  ];
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [deleteStatus, setDeleteStatus] = useState('');
 
-  const handleDelete = (id) => {
-    console.log('Delete item:', id);
-    // Add delete logic here
+  const endpointMap = {
+    Suits: '/admin/get-all-suits',
+    Shirts: '/admin/get-all-shirts',
+    Trousers: '/admin/get-all-trousers'
+  };
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      setError('');
+      setDeleteStatus('');
+      try {
+        const response = await api.get(endpointMap[activeSection]);
+        setProducts(response.data || []);
+      } catch (err) {
+        const message = err?.response?.data?.error || 'Failed to load products.';
+        setError(message);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [activeSection]);
+
+  const handleDelete = async (id) => {
+    if (!id) return;
+
+    const confirmDelete = window.confirm('Are you sure you want to delete this product?');
+    if (!confirmDelete) return;
+
+    try {
+      setDeleteStatus('');
+      await api.delete(`/admin/delete-product/${id}`);
+      setDeleteStatus('Product deleted successfully.');
+
+      // Remove from local state so UI updates without refetch
+      setProducts((prev) => prev.filter((item) => item.product_id !== id));
+    } catch (err) {
+      const message = err?.response?.data?.error || 'Failed to delete product.';
+      setDeleteStatus(message);
+    }
   };
 
   const handleEdit = (id) => {
-    console.log('Edit item:', id);
-    // Add edit logic here
+    if (!id) return;
+    navigate(`/admin/add-product/${id}`);
   };
 
   const handleLogout = () => {
-    console.log('Logout');
-    // Add logout logic here
+    localStorage.removeItem('isAdmin');
+    window.history.replaceState(null, '', '/');
+    navigate('/', { replace: true });
   };
 
   return (
@@ -43,19 +81,19 @@ const ShirtView = () => {
           <nav className="sidebar-nav">
             <div 
               className={`nav-item ${activeSection === 'Suits' ? 'active' : ''}`}
-              onClick={() => navigate('/admin/shirt-view')}
+              onClick={() => setActiveSection('Suits')}
             >
               Suits
             </div>
             <div 
               className={`nav-item ${activeSection === 'Shirts' ? 'active' : ''}`}
-              onClick={() => navigate('/admin/shirt-view')}
+              onClick={() => setActiveSection('Shirts')}
             >
               Shirts
             </div>
             <div 
               className={`nav-item ${activeSection === 'Trousers' ? 'active' : ''}`}
-              onClick={() => navigate('/admin/shirt-view')}
+              onClick={() => setActiveSection('Trousers')}
             >
               Trousers
             </div>
@@ -80,46 +118,64 @@ const ShirtView = () => {
             </button>
           </div>
 
+          {deleteStatus && (
+            <p className="status-text">{deleteStatus}</p>
+          )}
+
           <div className="admin-table-container">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Sr</th>
-                  <th>Name</th>
-                  <th>Price</th>
-                  <th>Quantity</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {suitsData.map((item, index) => (
-                  <tr key={item.id}>
-                    <td>{index + 1}</td>
-                    <td>{item.name}</td>
-                    <td>{item.price}</td>
-                    <td>{item.quantity}</td>
-                    <td>
-                      <div className="action-buttons">
-                        <button 
-                          className="action-btn edit-btn"
-                          onClick={() => handleEdit(item.id)}
-                          aria-label="Edit"
-                        >
-                          <FaEdit />
-                        </button>
-                        <button 
-                          className="action-btn delete-btn"
-                          onClick={() => handleDelete(item.id)}
-                          aria-label="Delete"
-                        >
-                          <FaTrash />
-                        </button>
-                      </div>
-                    </td>
+            {loading ? (
+              <p className="status-text">Loading {activeSection.toLowerCase()}...</p>
+            ) : error ? (
+              <p className="status-text error-text">{error}</p>
+            ) : products.length === 0 ? (
+              <p className="status-text">No {activeSection.toLowerCase()} found.</p>
+            ) : (
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Sr</th>
+                    <th>Code (SKU)</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {products.map((item, index) => (
+                    <tr key={item.product_id || index}>
+                      <td>{index + 1}</td>
+                      <td>{item.pro_code || 'N/A'}</td>
+                      <td>{item.name}</td>
+                      <td>
+                        {typeof item.price === 'number'
+                          ? `$${Number(item.price).toFixed(2)}`
+                          : item.price}
+                      </td>
+                      <td>{Number(item.total_quantity ?? 0)}</td>
+                      <td>
+                        <div className="action-buttons">
+                          <button 
+                            className="action-btn edit-btn"
+                            onClick={() => handleEdit(item.product_id)}
+                            aria-label="Edit"
+                          >
+                            <FaEdit />
+                          </button>
+                          <button 
+                            className="action-btn delete-btn"
+                            onClick={() => handleDelete(item.product_id)}
+                            aria-label="Delete"
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </Container>
       </main>

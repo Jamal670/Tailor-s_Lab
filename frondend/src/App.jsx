@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/customer/Home";
 import SuitCategoryPage from "./pages/customer/SuitCategoryPage";
 import ShirtCategory from "./pages/customer/ShirtCategory";
@@ -14,6 +14,11 @@ import NotFound from "./pages/customer/404";
 import ShirtView from "./pages/admin/ShirtView";
 import AddProduct from "./pages/admin/AddProduct";
 
+const PrivateAdminRoute = ({ children }) => {
+  const isAdmin = typeof window !== 'undefined' && localStorage.getItem("isAdmin") === "true";
+  return isAdmin ? children : <Navigate to="/admin-login" replace />;
+};
+
 function App() {
   return (
     <BrowserRouter>
@@ -24,13 +29,35 @@ function App() {
         <Route path="/trousers" element={<TrouserCategory />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/about" element={<About />} />
-        <Route path="/product" element={<Product />} />
+        <Route path="/product/:id" element={<Product />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/cart/checkout-info" element={<CheckoutInfo />} />
         <Route path="/order-complete" element={<OrderComp />} />
         <Route path="/admin-login" element={<Login />} />
-        <Route path="/admin/shirt-view" element={<ShirtView />} />
-        <Route path="/admin/add-product" element={<AddProduct />} />
+        <Route
+          path="/admin/shirt-view"
+          element={
+            <PrivateAdminRoute>
+              <ShirtView />
+            </PrivateAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/add-product"
+          element={
+            <PrivateAdminRoute>
+              <AddProduct />
+            </PrivateAdminRoute>
+          }
+        />
+        <Route
+          path="/admin/add-product/:id"
+          element={
+            <PrivateAdminRoute>
+              <AddProduct />
+            </PrivateAdminRoute>
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

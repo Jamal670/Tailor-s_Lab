@@ -1,31 +1,64 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Form } from 'react-bootstrap';
 import { IoRemoveOutline, IoAddOutline } from 'react-icons/io5';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Header from '../../components/headers/Header';
 import Footer from '../../components/footers/Footer';
 import '../../assets/css/CheckoutInfo.css';
+import {
+  getCartItems,
+  updateCartItemQuantity,
+  removeFromCart,
+  clearCart
+} from '../../utils/cartUtils';
+import api from '../../Api';
+import { formatColorLabel } from '../../utils/colorUtils';
+
+const initialFormState = {
+  firstName: '',
+  lastName: '',
+  phone: '',
+  email: '',
+  streetAddress: '',
+  city: '',
+  country: '',
+  zipcode: ''
+};
 
 const CheckoutInfo = () => {
-  const [quantity, setQuantity] = useState(1);
+  const navigate = useNavigate();
   const [shippingMethod, setShippingMethod] = useState('free');
   const [paymentMethod, setPaymentMethod] = useState('cash');
-  
-  // Sample product data
-  const product = {
-    name: "Active-T-Shirt - Black, M",
-    price: 18.00,
-    image: "/images/Trouser.png"
-  };
+  const [cartItems, setCartItems] = useState([]);
+  const [formData, setFormData] = useState(initialFormState);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const decreaseQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1);
+  useEffect(() => {
+    const items = getCartItems();
+    setCartItems(items);
+  }, []);
+
+  const handleQuantityChange = (index, newQuantity) => {
+    const item = cartItems[index];
+    if (!item) return;
+
+    const maxQty = Number(item.maxQuantity);
+    const resolvedMax = Number.isFinite(maxQty) && maxQty > 0 ? maxQty : null;
+    let nextQuantity = Math.max(1, newQuantity);
+
+    if (resolvedMax && nextQuantity > resolvedMax) {
+      nextQuantity = resolvedMax;
+      alert(`Only ${resolvedMax} unit(s) available for ${item.name}.`);
     }
+
+    const updatedItems = updateCartItemQuantity(index, nextQuantity);
+    setCartItems([...updatedItems]);
   };
 
-  const increaseQuantity = () => {
-    setQuantity(quantity + 1);
+  const handleRemoveItem = (index) => {
+    const updatedItems = removeFromCart(index);
+    setCartItems([...updatedItems]);
   };
 
   const handleShippingMethodChange = (e) => {
@@ -36,10 +69,92 @@ const CheckoutInfo = () => {
     setPaymentMethod(e.target.value);
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handlePlaceOrder = async () => {
+    if (!cartItems.length) {
+      setErrorMessage('Your cart is empty.');
+      return;
+    }
+
+    const requiredFields = ['firstName', 'lastName', 'phone', 'email', 'streetAddress', 'city', 'country', 'zipcode'];
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        setErrorMessage('Please fill in all required fields.');
+        return;
+      }
+    }
+
+    setIsSubmitting(true);
+    setErrorMessage('');
+
+    const payload = {
+      sessionId: null,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      phone: formData.phone,
+      email: formData.email,
+      streetAddress: formData.streetAddress,
+      city: formData.city,
+      country: formData.country,
+      zipcode: formData.zipcode,
+      paymentMethod,
+      shippingMethod,
+      totalAmount: total,
+      cartItems: cartItems.map(item => ({
+        product_id: item.product_id,
+        name: item.name,
+        size: item.size,
+        color: item.color,
+        color_hex: item.color_hex || '',
+        category: item.category,
+        quantity: item.quantity,
+        price: item.price,
+        image_url: item.image_url
+      }))
+    };
+
+    try {
+      const { data } = await api.post('/user/orders', payload);
+      clearCart();
+      setCartItems([]);
+      setFormData(initialFormState);
+      localStorage.setItem('latestOrder', JSON.stringify(data.order));
+      navigate('/order-complete', { state: { order: data.order } });
+    } catch (error) {
+      console.error('Order submission error:', error);
+      setErrorMessage(error.response?.data?.error || 'Failed to place order. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // Calculate totals
-  const subtotal = product.price * quantity;
+  const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   const shippingCost = shippingMethod === 'flat' ? 12.00 : 0;
   const total = subtotal + shippingCost;
+
+  const getImageUrl = (imageUrl) => {
+    if (!imageUrl) return "/images/feature.png";
+    const apiBase = import.meta.env.VITE_API_URL?.replace(/\/$/, '');
+    return apiBase ? `${apiBase}/uploads/${imageUrl}` : `/uploads/${imageUrl}`;
+  };
+
+  const getDisplayColor = (item) => {
+    if (item.color) {
+      return formatColorLabel(item.color);
+    }
+    if (item.color_hex) {
+      return formatColorLabel(item.color_hex);
+    }
+    return 'N/A';
+  };
 
   return (
     <div className="checkout-info-wrapper">
@@ -80,6 +195,10 @@ const CheckoutInfo = () => {
                       <Form.Control 
                         type="text" 
                         placeholder="John"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleInputChange}
+                        required
                       />
                     </Form.Group>
                   </Col>
@@ -89,6 +208,10 @@ const CheckoutInfo = () => {
                       <Form.Control 
                         type="text" 
                         placeholder="Doe"
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={handleInputChange}
+                        required
                       />
                     </Form.Group>
                   </Col>
@@ -101,6 +224,10 @@ const CheckoutInfo = () => {
                       <Form.Control 
                         type="tel" 
                         placeholder="+91 9876543210"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        required
                       />
                     </Form.Group>
                   </Col>
@@ -110,6 +237,10 @@ const CheckoutInfo = () => {
                       <Form.Control 
                         type="email" 
                         placeholder="john.doe@example.com"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        required
                       />
                     </Form.Group>
                   </Col>
@@ -122,6 +253,10 @@ const CheckoutInfo = () => {
                       <Form.Control 
                         type="text" 
                         placeholder="123 Main St"
+                        name="streetAddress"
+                        value={formData.streetAddress}
+                        onChange={handleInputChange}
+                        required
                       />
                     </Form.Group>
                   </Col>
@@ -131,6 +266,10 @@ const CheckoutInfo = () => {
                       <Form.Control 
                         type="text" 
                         placeholder="New York"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleInputChange}
+                        required
                       />
                     </Form.Group>
                   </Col>
@@ -143,6 +282,10 @@ const CheckoutInfo = () => {
                       <Form.Control 
                         type="text" 
                         placeholder="United States"
+                        name="country"
+                        value={formData.country}
+                        onChange={handleInputChange}
+                        required
                       />
                     </Form.Group>
                   </Col>
@@ -152,6 +295,10 @@ const CheckoutInfo = () => {
                       <Form.Control 
                         type="text" 
                         placeholder="10001"
+                        name="zipcode"
+                        value={formData.zipcode}
+                        onChange={handleInputChange}
+                        required
                       />
                     </Form.Group>
                   </Col>
@@ -164,28 +311,61 @@ const CheckoutInfo = () => {
               <div className="order-summary">
                 <h2 className="summary-title">PRODUCT</h2>
                 <div className="order-product">
-                  <div className="product-info">
-                    <div className="product-image">
-                      <img src={product.image} alt={product.name} />
-                    </div>
-                    <div className="product-details">
-                      <h4 className="product-name">{product.name}</h4>
-                      <div className="quantity-selector">
-                        <button className="quantity-btn" onClick={decreaseQuantity}>
-                          <IoRemoveOutline />
-                        </button>
-                        <span className="quantity-value">{quantity}</span>
-                        <button className="quantity-btn" onClick={increaseQuantity}>
-                          <IoAddOutline />
-                        </button>
+                  {cartItems.length === 0 ? (
+                    <div className="empty-order-summary">Your cart is empty</div>
+                  ) : (
+                    cartItems.map((item, index) => (
+                        <div className="product-info" key={index}>
+                        <button className="remove-product" onClick={() => handleRemoveItem(index)}>×</button>
+                        <div className="product-image" >
+                          <img src={getImageUrl(item.image_url)} alt={item.name} />
+                        </div>
+                          <div className="product-details"  >
+                            <h4 className="product-name" style={{ color: '#000' }}>
+                              {item.product_id ? (
+                                <Link
+                                  to={`/product/${item.product_id}`}
+                                  style={{ color: 'inherit', textDecoration: 'none' }}
+                                >
+                                  {item.name}
+                                </Link>
+                              ) : (
+                                item.name
+                              )}
+                            </h4>
+                          {(item.size || item.color) && (
+                            <div className="product-variants">
+                              {item.size && <span>Size: {item.size}</span>}
+                              {item.size && item.color && <span> • </span>}
+                              {(item.color || item.color_hex) && (
+                                <span>Color: {getDisplayColor(item)}</span>
+                              )}
+                            </div>
+                          )}
+                          <div className="quantity-selector">
+                            <button 
+                              className="quantity-btn" 
+                              onClick={() => handleQuantityChange(index, item.quantity - 1)}
+                              disabled={item.quantity <= 1}
+                            >
+                              <IoRemoveOutline />
+                            </button>
+                            <span className="quantity-value" style={{ color: '#000' }}>{item.quantity}</span>
+                            <button 
+                              className="quantity-btn" 
+                              onClick={() => handleQuantityChange(index, item.quantity + 1)}
+                            >
+                              <IoAddOutline />
+                            </button>
+                          </div>
+                        </div>
+                        {/* <div className="product-price">
+                          <span className="subtotal-label">SUBTOTAL</span>
+                          <span className="subtotal-value">${(item.price * item.quantity).toFixed(2)}</span>
+                        </div> */}
                       </div>
-                    </div>
-                    <div className="product-price">
-                      <span className="subtotal-label">SUBTOTAL</span>
-                      <span className="subtotal-value">${subtotal.toFixed(2)}</span>
-                    </div>
-                    <button className="remove-product">×</button>
-                  </div>
+                    ))
+                  )}
                 </div>
 
                 <div className="order-totals">
@@ -276,13 +456,20 @@ const CheckoutInfo = () => {
                     </div>
                   )}
 
-                  <Link to="/order-complete" className="order-link">
-                  <a href="/order-complete">
-                    <button className="place-order-btn">
-                      PLACE ORDER
+                  {errorMessage && (
+                    <div className="order-error">{errorMessage}</div>
+                  )}
+
+                  {cartItems.length > 0 && (
+                    <button
+                      className="place-order-btn"
+                      type="button"
+                      onClick={handlePlaceOrder}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'PLACING ORDER...' : 'PLACE ORDER'}
                     </button>
-                  </a>
-                  </Link>
+                  )}
                 </div>
               </div>
             </Col>

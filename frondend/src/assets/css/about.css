@@ -11,7 +11,7 @@
   --border-radius: 25px;
   --transition: all 0.3s ease;
 }
-  
+
 body {
   min-height: 100vh;
   display: flex;
@@ -51,7 +51,7 @@ body::before {
   overflow: hidden;
   border-radius: 15px;
   margin: 100px 0 0 0;
-  padding: 0;
+  padding: 10px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
@@ -99,7 +99,7 @@ body::before {
 
 .brand-story-hero h2 {
   font-family: 'Raleway', sans-serif;
-  font-size:1.9rem;
+  font-size: 1.9rem;
   font-weight: 600;
   color: #000000;
   margin-bottom: 1.5rem;
@@ -120,7 +120,7 @@ body::before {
 .about-cards-section {
   padding: 0;
   width: 100%;
-  margin: 0;
+  margin-bottom: 10px;
   max-width: 100%;
 }
 
@@ -259,26 +259,26 @@ body::before {
     max-height: 600px;
     margin: 100px 0 0 0;
   }
-  
+
   .hero-image {
     width: 250%;
     height: auto;
     max-height: 100%;
     transform: scale(2.5);
   }
-  
+
   .hero-overlay {
     width: 55%;
     z-index: 10;
   }
-  
+
   .cards-row {
     flex-direction: column;
     align-items: center;
     margin-top: 30px;
     gap: 20px;
   }
-  
+
   .card-col:nth-child(1),
   .card-col:nth-child(2),
   .card-col:nth-child(3) {
@@ -287,19 +287,19 @@ body::before {
     width: 90%;
     max-width: 500px;
   }
-  
+
   .card-col:nth-child(1) .about-card,
   .card-col:nth-child(2) .about-card,
   .card-col:nth-child(3) .about-card {
     width: 100%;
     height: 500px;
   }
-  
+
   .text-card h3 {
     font-size: 28px;
     line-height: 46px;
   }
-  
+
   .text-card p {
     font-size: 18px;
     line-height: 28px;
@@ -311,34 +311,34 @@ body::before {
     max-height: 500px;
     margin: 100px 0 0 0;
   }
-  
+
   .hero-image {
     width: 250%;
     height: auto;
     max-height: 100%;
     transform: scale(2.5);
   }
-  
+
   .hero-overlay {
     width: 65%;
     z-index: 10;
   }
-  
+
   .brand-story-hero h2 {
     font-size: 1.6rem;
   }
-  
+
   .brand-story-hero p {
     font-size: 0.85rem;
   }
-  
+
   .cards-row {
     flex-direction: column;
     align-items: center;
     margin-top: 50px;
     gap: 30px;
   }
-  
+
   .card-col:nth-child(1),
   .card-col:nth-child(2),
   .card-col:nth-child(3) {
@@ -347,19 +347,19 @@ body::before {
     width: 90%;
     max-width: 450px;
   }
-  
+
   .card-col:nth-child(1) .about-card,
   .card-col:nth-child(2) .about-card,
   .card-col:nth-child(3) .about-card {
     width: 100%;
     height: 500px;
   }
-  
+
   .text-card h3 {
     font-size: 26px;
     line-height: 40px;
   }
-  
+
   .text-card p {
     font-size: 17px;
     line-height: 26px;
@@ -371,55 +371,55 @@ body::before {
     max-height: 400px;
     margin: 100px 0 0 0;
   }
-  
+
   .hero-image {
     width: 250%;
     height: auto;
     max-height: 100%;
     transform: scale(2.5);
   }
-  
+
   .hero-overlay {
     width: 85%;
     padding: 1.5rem;
     z-index: 10;
   }
-  
+
   .brand-story-hero h2 {
     font-size: 1.4rem;
   }
-  
+
   .brand-story-hero p {
     font-size: 0.8rem;
   }
-  
+
   .cards-row {
     margin-top: 40px;
   }
-  
+
   .card-col:nth-child(1),
   .card-col:nth-child(2),
   .card-col:nth-child(3) {
     width: 95%;
     max-width: 400px;
   }
-  
+
   .card-col:nth-child(1) .about-card,
   .card-col:nth-child(2) .about-card,
   .card-col:nth-child(3) .about-card {
     height: 450px;
   }
-  
+
   .text-card {
     padding: 1.8rem;
   }
-  
+
   .text-card h3 {
     font-size: 24px;
     line-height: 36px;
     margin-bottom: 1.2rem;
   }
-  
+
   .text-card p {
     font-size: 16px;
     line-height: 24px;
@@ -432,52 +432,58 @@ body::before {
     margin: 100px 0 0 0;
     border-radius: 0;
   }
-  
+
   .hero-image {
-    width: 250%;
+    width: 300%;
     height: auto;
     max-height: 100%;
-    transform: scale(2.5);
+    transform: scale(1);
   }
-  
+
   .hero-overlay {
-    width: 100%;
+    width: 75%;
     padding: 1rem;
     border-radius: 0;
+    position: absolute;
+    top: 160px;
+    left: 55px;
   }
-  
+
   .brand-story-hero h2 {
-    font-size: 1.2rem;
+    font-size: 1rem;
   }
-  
+  .brand-story-hero p {
+    font-size: 0.7rem;
+  }
+
   .cards-row {
     margin-top: 30px;
   }
-  
+
   .card-col:nth-child(1),
   .card-col:nth-child(2),
   .card-col:nth-child(3) {
     width: 95%;
     max-width: 350px;
   }
-  
+
   .card-col:nth-child(1) .about-card,
   .card-col:nth-child(2) .about-card,
   .card-col:nth-child(3) .about-card {
     height: 400px;
     border-radius: 25px;
   }
-  
+
   .text-card {
     padding: 1.5rem;
   }
-  
+
   .text-card h3 {
     font-size: 22px;
     line-height: 32px;
     margin-bottom: 1rem;
   }
-  
+
   .text-card p {
     font-size: 15px;
     line-height: 22px;

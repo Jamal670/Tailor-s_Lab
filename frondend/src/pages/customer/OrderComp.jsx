@@ -1,41 +1,103 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
+import { useLocation, Link } from 'react-router-dom';
+import { formatColorLabel } from '../../utils/colorUtils';
 import Header from '../../components/headers/Header';
 import Footer from '../../components/footers/Footer';
 import '../../assets/css/OrderComp.css';
 
-const OrderComp = () => {
-  // Sample order data
-  const orderData = {
-    orderNumber: '1013',
-    date: 'September 4, 2025',
-    total: 18.00,
-    paymentMethod: 'Cash on delivery',
-    product: {
-      name: 'Active-T-Shirt - Black, M',
-      color: 'Black',
-      size: 'M',
-      quantity: 1,
-      price: 18.00
-    },
-    shipping: 'Free shipping',
+const formatOrder = (order) => {
+  const total = Number(order.totalAmount || order.total || 0);
+  const createdDate = order.createdAt ? new Date(order.createdAt) : new Date();
+  const shippingAmount = order.shippingMethod === 'flat' ? 12 : 0;
+  const shippingLabel = order.shippingMethod === 'flat' ? 'Flat rate: $12.00' : 'Free shipping';
+  const paymentLabel = order.paymentMethod === 'CARD' ? 'Card payment' : 'Cash on delivery';
+  const fullName = `${order.firstName || ''} ${order.lastName || ''}`.trim();
+
+  return {
+    orderNumber: order.orderId || order.orderNumber || 'N/A',
+    trackingId: order.trackingId || order.tracking_id || 'N/A',
+    date: createdDate.toLocaleDateString(),
+    total,
+    subtotal: Math.max(total - shippingAmount, 0),
+    paymentMethod: paymentLabel,
+    shipping: shippingLabel,
     billingAddress: {
-      name: 'Ali Ahmed',
-      address: 'Gulberg greens, Islamabad, Pakistan',
-      city: 'Islamabad',
-      zipCode: '43000',
-      country: 'Pakistan',
-      phone: '+923187978407',
-      email: 'ali631073@gmail.com'
+      name: fullName || 'Customer',
+      address: order.streetAddress || '',
+      city: order.city || '',
+      zipCode: order.zipcode || '',
+      country: order.country || '',
+      phone: order.phone || '',
+      email: order.email || ''
     },
     shippingAddress: {
-      name: 'Ali Ahmed',
-      address: 'Gulberg greens, Islamabad, Pakistan',
-      city: 'Islamabad',
-      zipCode: '43000',
-      country: 'Pakistan'
-    }
+      name: fullName || 'Customer',
+      address: order.streetAddress || '',
+      city: order.city || '',
+      zipCode: order.zipcode || '',
+      country: order.country || ''
+    },
+    items: order.items || [],
+    shippingAmount,
+    note: paymentLabel === 'Cash on delivery' ? 'Pay with cash upon delivery.' : 'Paid online.'
   };
+};
+
+const OrderComp = () => {
+  const location = useLocation();
+  const [orderData, setOrderData] = useState(null);
+
+  const getDisplayColor = (item) => {
+    if (item?.color) {
+      return formatColorLabel(item.color);
+    }
+    if (item?.color_hex) {
+      return formatColorLabel(item.color_hex);
+    }
+    return 'N/A';
+  };
+
+  useEffect(() => {
+    if (location.state?.order) {
+      const formatted = formatOrder(location.state.order);
+      setOrderData(formatted);
+      localStorage.setItem('latestOrder', JSON.stringify(formatted));
+    } else {
+      const stored = localStorage.getItem('latestOrder');
+      if (stored) {
+        setOrderData(JSON.parse(stored));
+      }
+    }
+  }, [location.state]);
+
+  if (!orderData) {
+    return (
+      <div className="order-complete-wrapper">
+        <Header />
+        <section className="page-title-section">
+          <Container>
+            <h1 className="page-title">Order Complete</h1>
+          </Container>
+        </section>
+        <section className="order-complete-content-section">
+          <Container>
+            <p style={{ color: '#fff', textAlign: 'center' }}>
+              We couldn't find a recent order. Please return to the shop.
+            </p>
+            <div className="continue-shopping-section">
+              <div className="continue-shopping-btn-container">
+                <Link to="/">
+                  <button className="continue-shopping-btn">Continue shopping</button>
+                </Link>
+              </div>
+            </div>
+          </Container>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="order-complete-wrapper">
@@ -78,6 +140,10 @@ const OrderComp = () => {
                 <div className="summary-value">{orderData.orderNumber}</div>
               </div>
               <div className="order-summary-item">
+                <div className="summary-label">Tracking ID:</div>
+                <div className="summary-value">{orderData.trackingId || 'N/A'}</div>
+              </div>
+              <div className="order-summary-item">
                 <div className="summary-label">Date:</div>
                 <div className="summary-value">{orderData.date}</div>
               </div>
@@ -92,7 +158,7 @@ const OrderComp = () => {
             </div>
 
             <div className="payment-note">
-              <p>Pay with cash upon delivery.</p>
+              <p>{orderData.note}</p>
             </div>
 
             {/* Order Details */}
@@ -104,20 +170,57 @@ const OrderComp = () => {
                 <div className="total-header">TOTAL</div>
               </div>
 
-              <div className="order-product-item">
-                <div className="product-info">
-                  <div className="product-name">{orderData.product.name} × {orderData.product.quantity}</div>
-                  <div className="product-meta">
-                    <div className="product-color">Color: {orderData.product.color}</div>
-                    <div className="product-size">Size: {orderData.product.size}</div>
+              {orderData.items.length === 0 ? (
+                <div className="order-product-item">
+                  <div className="product-info">
+                    <div className="product-name">No products found</div>
                   </div>
                 </div>
-                <div className="product-total">${orderData.product.price.toFixed(2)}</div>
-              </div>
+              ) : (
+                orderData.items.map((item, index) => (
+                  <div className="order-product-item" key={`${item.product_id}-${index}`}>
+                    <div className="product-info">
+                      <div className="product-image">
+                        <img
+                          src={
+                            item.image_url
+                              ? (import.meta.env.VITE_API_URL
+                                  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/uploads/${item.image_url}`
+                                  : `/uploads/${item.image_url}`)
+                              : '/images/feature.png'
+                          }
+                          alt={item.name}
+                        />
+                      </div>
+                      <div className="product-details">
+                        <div className="product-name" style={{ color: '#000' }}>
+                          {item.product_id ? (
+                            <Link to={`/product/${item.product_id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                              {item.name}
+                            </Link>
+                          ) : (
+                            item.name
+                          )} × {item.quantity}
+                        </div>
+                        <div className="product-meta">
+                          {(item.color || item.color_hex) && (
+                            <div className="product-color">Color: {getDisplayColor(item)}</div>
+                            
+                          )}
+                          {item.size && <div className="product-size">Size: {item.size}</div>}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="product-total">
+                      ${(Number(item.price || 0) * Number(item.quantity || 1)).toFixed(2)}
+                    </div>
+                  </div>
+                ))
+              )}
 
               <div className="order-summary-item subtotal-item">
                 <div className="summary-label">Subtotal:</div>
-                <div className="summary-value">${orderData.total.toFixed(2)}</div>
+                <div className="summary-value">${orderData.subtotal.toFixed(2)}</div>
               </div>
 
               <div className="order-summary-item shipping-item">
@@ -148,8 +251,8 @@ const OrderComp = () => {
                       <p>{orderData.billingAddress.city}</p>
                       <p>{orderData.billingAddress.zipCode}</p>
                       <p>{orderData.billingAddress.country}</p>
-                      <p>{orderData.billingAddress.phone}</p>
-                      <p>{orderData.billingAddress.email}</p>
+                      {orderData.billingAddress.phone && <p>{orderData.billingAddress.phone}</p>}
+                      {orderData.billingAddress.email && <p>{orderData.billingAddress.email}</p>}
                     </div>
                   </div>
                 </Col>
@@ -167,14 +270,14 @@ const OrderComp = () => {
                 </Col>
               </Row>
               <div className="continue-shopping-section">
-  <div className="continue-shopping-btn-container">
-    <a href="/">
-      <button className="continue-shopping-btn">
-        Continue shopping
-      </button>
-    </a>
-  </div>
-</div>
+                <div className="continue-shopping-btn-container">
+                  <Link to="/">
+                    <button className="continue-shopping-btn">
+                      Continue shopping
+                    </button>
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
 

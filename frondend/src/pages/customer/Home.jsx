@@ -1,18 +1,22 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../../assets/css/home.css';
-import { FaCut, FaShoppingCart } from 'react-icons/fa';
+import { FaCut, FaShoppingCart, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { BsFillSquareFill } from "react-icons/bs";
 import { GiSewingMachine, GiSewingNeedle } from "react-icons/gi";
 import { PiShirtFolded } from "react-icons/pi";
 import { GiDiamonds } from "react-icons/gi";
 import Header from '../../components/headers/Header';
 import Footer from '../../components/footers/Footer';
+import api from '../../Api';
 
 const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const sliderRef = useRef(null);
   
   // Function to scroll to collection section
   const scrollToCollection = () => {
@@ -34,6 +38,24 @@ const Home = () => {
     }
   }, [location.state, navigate, location.pathname]);
 
+  // Fetch featured products on component mount
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get('/user/get-featured-products');
+        setFeaturedProducts(response.data || []);
+      } catch (error) {
+        console.error('Error fetching featured products:', error);
+        setFeaturedProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedProducts();
+  }, []);
+
   // Brand logos for the loop
   const brandLogos = [
     "/images/1.png",
@@ -42,39 +64,31 @@ const Home = () => {
     "/images/4.png"
   ];
 
-  // Features data
-  const featuresData = [
-    {
-      id: 1,
-      name: "Chocolate Brown Cotton Suit",
-      price: "$340.00",
-      image: "/images/feature.png"
-    },
-    {
-      id: 2,
-      name: "Classic Black Wool Suit",
-      price: "$420.00",
-      image: "/images/feature.png"
-    },
-    {
-      id: 3,
-      name: "Navy Blue Pinstripe Suit",
-      price: "$380.00",
-      image: "/images/feature.png"
-    },
-    {
-      id: 4,
-      name: "Gray Herringbone Suit",
-      price: "$390.00",
-      image: "/images/feature.png"
-    },
-    {
-      id: 5,
-      name: "Gray Herringbone Suit",
-      price: "$390.00",
-      image: "/images/feature.png"
+  // Get image URL helper
+  const getImageUrl = (imageUrl) => {
+    if (!imageUrl) return "/images/feature.png";
+    const apiBase = import.meta.env.VITE_API_URL?.replace(/\/$/, '');
+    return apiBase ? `${apiBase}/uploads/${imageUrl}` : `/uploads/${imageUrl}`;
+  };
+
+  // Scroll functions for features slider
+  const scrollLeft = () => {
+    if (sliderRef.current) {
+      sliderRef.current.scrollBy({
+        left: -320,
+        behavior: 'smooth'
+      });
     }
-  ];
+  };
+
+  const scrollRight = () => {
+    if (sliderRef.current) {
+      sliderRef.current.scrollBy({
+        left: 320,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   return (
     <div className="home-wrapper">
@@ -172,28 +186,53 @@ const Home = () => {
       <section className="features-section">
         <Container>
           <h2 className="section-title" style={{ color: "#E2D9C8", fontSize: "3rem" }}>FEATURES</h2>
-          <div className="features-slider">
-            <div className="features-track">
-              {featuresData.map((feature) => (
-                <div className="feature-item" key={feature.id}>
-                  <div className="feature-image">
-                    <img src={feature.image} alt={feature.name} />
-                  </div>
-                  <div className="feature-overlay">
-                    <div className="feature-details">
-                      <h4>{feature.name}</h4>
-                      <div className="feature-price">{feature.price}</div>
-                    </div>
-                    <div className="cart-container">
-                      <Button variant="light" className="add-to-cart-btn">
-                        <FaShoppingCart style={{ color: 'white', fill: 'white' }} />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+          {loading ? (
+            <div style={{ textAlign: 'center', color: '#E2D9C8', padding: '2rem' }}>
+              Loading featured products...
             </div>
-          </div>
+          ) : featuredProducts.length === 0 ? (
+            <div style={{ textAlign: 'center', color: '#E2D9C8', padding: '2rem' }}>
+              No featured products available
+            </div>
+          ) : (
+            <div className="features-slider-wrapper">
+              <button className="slider-nav-btn slider-nav-left" onClick={scrollLeft} aria-label="Scroll left">
+                <FaChevronLeft />
+              </button>
+              <div className="features-slider" ref={sliderRef}>
+                <div className="features-track">
+                  {featuredProducts.map((product) => (
+                    <div 
+                    className="feature-item" 
+                    key={product.product_id}
+                    onClick={() => navigate(`/product/${product.product_id}`)}
+                    style={{ cursor: 'pointer' }}
+                    >
+                      <div className="feature-image">
+                        <img src={getImageUrl(product.image_url)} alt={product.name} />
+                      </div>
+                      <div className="feature-overlay">
+                        <div className="feature-details">
+                          <h4>{product.name}</h4>
+                          <div className="feature-price">
+                            ${typeof product.price === 'number' ? Number(product.price).toFixed(2) : product.price}
+                          </div>
+                        </div>
+                        <div className="cart-container">
+                          <Button variant="light" className="add-to-cart-btn">
+                            <FaShoppingCart style={{ color: 'white', fill: 'white' }} />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <button className="slider-nav-btn slider-nav-right" onClick={scrollRight} aria-label="Scroll right">
+                <FaChevronRight />
+              </button>
+            </div>
+          )}
         </Container>
       </section>
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Container, Form, Button } from 'react-bootstrap';
+import { Container, Form, Button, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import api from '../../Api';
 import '../../assets/css/admin/login.css';
 
 const Login = () => {
@@ -9,6 +10,8 @@ const Login = () => {
     email: '',
     password: ''
   });
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -17,11 +20,28 @@ const Login = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    navigate('/admin/shirt-view');
-    console.log('Login attempt:', formData);
+
+    if (!formData.email.trim() || !formData.password.trim()) {
+      setError('Enter your credentials');
+      return;
+    }
+
+    setError('');
+    setIsSubmitting(true);
+
+    try {
+      await api.post('/admin/login', formData);
+      localStorage.setItem('isAdmin', 'true');
+      navigate('/admin/shirt-view');
+    } catch (err) {
+      const message =
+        err?.response?.data?.error || 'Unable to login. Please try again.';
+      setError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -30,6 +50,11 @@ const Login = () => {
         <div className="login-box">
           <h1 className="login-title">Admin Login</h1>
           <Form onSubmit={handleSubmit}>
+            {error && (
+              <Alert variant="danger" className="mb-4">
+                {error}
+              </Alert>
+            )}
             <Form.Group className="mb-4" controlId="formEmail">
               <Form.Label className="form-label">Email</Form.Label>
               <Form.Control
@@ -56,8 +81,13 @@ const Login = () => {
               />
             </Form.Group>
 
-            <Button type="submit" className="login-btn" variant="primary">
-              Login
+            <Button
+              type="submit"
+              className="login-btn"
+              variant="primary"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Logging in...' : 'Login'}
             </Button>
           </Form>
         </div>

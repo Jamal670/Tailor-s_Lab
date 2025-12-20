@@ -20,7 +20,7 @@ const About = () => {
             <div className="brand-story-hero">
               <h2>Brand Story</h2>
               <p>
-                At Tailor's Lab, our journey began with a vision to create suits that are a perfect blend of expression of oneself, while respecting the exquisite tradition of tailor-made clothing. Discovering your uniqueness and modern tailoring can be.
+                We are Tailors Lab. A design house where suits are redefined, created with a spirit of originality and purpose.
               </p>
             </div>
           </div>
@@ -41,10 +41,10 @@ const About = () => {
             <div className="about-card text-card">
               <h3>Our Values</h3>
               <p>
-                Tailor's Lab was born from a vision to blend premium tailoring with sustainable practices. We fuse traditional craftsmanship and contemporary technology to create garments for quality-conscious, ethically-minded individuals.
+                Our mission extends beyond clothing. By working with skilled artisans in communities where employment creates lasting impact, we help sustain livelihoods and preserve craftsmanship. Each suit carries not only the mark of design innovation, but also the story of giving back.
               </p>
               <p>
-                Our journey is about more than fashion—it's about empowering personal expression while driving change in the industry, with items that are as durable as they are elegant.
+                Tailors Lab is a designer brand with a conscience , built for those who value design, responsibility, and the courage to stand apart.
               </p>
             </div>
           </div>
@@ -52,10 +52,10 @@ const About = () => {
             <div className="about-card text-card">
               <h3>Tailoring Heritage</h3>
               <p>
-                We at Tailor's Lab, a design house established in 2015, bring a fresh perspective to the craft of bespoke suits. With a team of visionary tailors who blend style with a customer's story for that perfect fit—like you've always owned it.
+                We are Tailors Lab. A design house where suits are redefined, created with a spirit of originality and purpose. Tailors Lab is a designer brand with a conscience , built for those who value design, responsibility, and the courage to stand apart.
               </p>
               <p>
-                Our commitment goes beyond ordinary tailoring—from precision measurements to the finest fabrics, we create pieces that are truly yours.
+                At Tailors Lab, we redefine the suit. We are not bound by tradition, nor do we follow the path of imitation.
               </p>
             </div>
           </div>

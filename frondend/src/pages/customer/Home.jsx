@@ -130,9 +130,7 @@ const Home = () => {
           <Row>
             <Col md={12}>
               <p className="about-text">
-                At Tailor Lab, we believe the suit should be more than a uniform; it should be an
-                expression of individuality. That's why we don't replicate tradition or follow trends. We
-                design differently, experimenting and reimagining what modern tailoring can be.
+                At Tailors Lab, we believe the suit should be more than a uniform, it should be an expression of individuality. That’s why we don’t replicate tradition or follow trends. We design differently, experimenting and reimagining what modern tailoring can be.
               </p>
             </Col>
           </Row>

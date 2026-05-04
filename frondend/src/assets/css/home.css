@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&family=Cantarell:wght@400;700&family=Bonheur+Royale&family=Bodoni+Moda+SC:opsz,wght@6..96,400;6..96,700&family=Raleway:wght@400;500;600&family=Libre+Caslon+Display&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&family=Cantarell:wght@400;700&family=Bonheur+Royale&family=Bodoni+Moda+SC:opsz,wght@6..96,400;6..96,700&family=Raleway:wght@400;500;600&family=Libre+Caslon+Display&family=Montserrat:wght@300;400;500;600;700&family=Geist:wght@400;500;600;700&display=swap');
 
 :root {
   --primary-color: #1a1a1a;
@@ -45,17 +45,20 @@ body::before {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Bodoni Moda SC', serif;
+  font-family: 'Geist', 'Bodoni Moda SC', serif;
   font-weight: 600;
+  color: #F5E3C3;
 }
 
 .section-title {
   font-size: 2.5rem;
-  color: #E2D9C8;
+  background: linear-gradient(92.32deg, #9A8463 1.94%, #EDDFCB 157.05%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   margin-bottom: 2rem;
   letter-spacing: 2px;
   text-transform: uppercase;
-  font-family: 'Bodoni Moda SC', serif;
+  font-family: 'Geist', 'Bodoni Moda SC', serif;
 }
 
 /* Header Styles */
@@ -79,8 +82,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .logo-img {
-  height: 100px;
-  width: 100px;
+  height: 110px;
+  width: 110px;
   border-radius: 50%;
 }
 
@@ -135,7 +138,7 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #2c2c2c;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   border-radius: 25px;
   border: 0.5px solid var(--text-color);
   overflow: hidden;
@@ -146,6 +149,16 @@ h1, h2, h3, h4, h5, h6 {
   background-position: center;
 }
 
+.hero-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
 .hero-section::before {
   content: '';
   position: absolute;
@@ -154,22 +167,23 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.2);
+  z-index: 1;
 }
 
 .hero-content {
   position: relative;
   z-index: 2;
-  text-align: left;
-  padding: 0 4rem;
   width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5vw;
 }
 
 .hero-text {
-  max-width: 400px;
-  margin: 350px 0 0 60px;
-  position: absolute;
-  bottom: 100px;
-  left: 305px;
+  max-width: 700px;
+  text-align: center;
 }
 
 .hero-text .couture {
@@ -181,16 +195,31 @@ h1, h2, h3, h4, h5, h6 {
   text-align: right;
 }
 
-.hero-text .suits {
-  font-size: 7rem;
-  font-weight: 700;
-  color: var(--secondary-color);
-  margin-top: 0;
-  letter-spacing: 4px;
+.hero-subtitle {
+  max-width: 138px;
+  margin: 0 auto 0.75rem;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 100%;
+  letter-spacing: 0;
+  color: #FFFFFF;
+}
+
+.hero-heading {
+  max-width: 635px;
+  margin: 0 auto 1.5rem;
   font-family: 'Bodoni Moda SC', serif;
-  line-height: 1;
-  margin-bottom: 1.5rem;
-  text-align: right;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 55px;
+  line-height: 100%;
+  letter-spacing: 0;
+  background: linear-gradient(92.32deg, #FFFFFF 1.94%, #FCF6E9 157.05%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .shop-now-btnn {
@@ -203,6 +232,21 @@ h1, h2, h3, h4, h5, h6 {
   border: none;
   color: var(--text-color);
   border: 1px solid var(--text-color);
+  display: inline-block;
+  margin-top: 1.5rem;
+}
+.shop-now-btnnn {
+  background: none;
+  padding: 0.5rem 8rem;
+  border-radius: 15px;
+  font-weight: 500;
+  transition: var(--transition);
+  font-family: 'Cantarell', sans-serif;
+  border: none;
+  color: var(--text-color);
+  border: 1px solid var(--text-color);
+  display: inline-block;
+  margin-top: 1.5rem;
 }
 
 .shop-now-btn:hover {
@@ -261,17 +305,18 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .about-section .section-title {
-  font-size: 4rem;
-  color: var(--secondary-color);
+  font-size: 3.5rem;
+  color: #F5E3C3;
   text-align: left;
   margin-bottom: 2rem;
+  font-family: 'Geist', 'Bodoni Moda SC', serif;
 }
 
 .about-text {
-  font-family: 'Raleway', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-weight: 400;
   font-style: normal;
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1.8;
   letter-spacing: 0px;
   word-spacing: 7px;
@@ -821,12 +866,6 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Responsive Styles */
 @media (max-width: 1200px) {
-  .hero-text {
-    margin: 150px 0 0 150px;
-    bottom: 100px;
-    left: 150px;
-  }
-  
   .feature-item {
     flex: 0 0 280px;
     height: 380px;
@@ -851,15 +890,13 @@ h1, h2, h3, h4, h5, h6 {
   .section-title {
     font-size: 2rem;
   }
-  
-  .hero-text {
-    margin: 100px 0 0 50px;
-    bottom: 100px;
-    left: 50px;
+
+  .hero-section {
+    height: 90vh;
   }
   
-  .hero-text .suits {
-    font-size: 7rem;
+  .hero-heading {
+    font-size: 42px;
   }
   
   .shop-now-btn {
@@ -949,18 +986,16 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0 1rem 0 0;
   }
   
-  .hero-text {
-    margin: 80px 0 0 20px;
-    bottom: 80px;
-    left: 20px;
+  .hero-section {
+    height: 85vh;
   }
-  
-  .hero-text .couture {
-    font-size: 1.5rem;
+
+  .hero-subtitle {
+    font-size: 16px;
   }
-  
-  .hero-text .suits {
-    font-size: 7rem;
+
+  .hero-heading {
+    font-size: 34px;
   }
   
   .shop-now-btn {
@@ -1075,17 +1110,15 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (max-width: 575px) {
   .hero-section {
-    height: 100vh;
+    height: 80vh;
   }
-  
-  .hero-text {
-    margin: 60px 0 0 10px;
-    bottom: 60px;
-    left: 10px;
+
+  .hero-subtitle {
+    font-size: 14px;
   }
-  
-  .hero-text .suits {
-    font-size: 7rem;
+
+  .hero-heading {
+    font-size: 28px;
   }
   
   .shop-now-btn {

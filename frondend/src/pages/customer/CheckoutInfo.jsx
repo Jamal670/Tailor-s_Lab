@@ -1,38 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Form } from 'react-bootstrap';
-import { IoRemoveOutline, IoAddOutline } from 'react-icons/io5';
-import { useNavigate, Link } from 'react-router-dom';
-import Header from '../../components/headers/Header';
-import Footer from '../../components/footers/Footer';
-import '../../assets/css/CheckoutInfo.css';
+import React, { useState, useEffect } from "react";
+import { Container, Row, Col, Form } from "react-bootstrap";
+import { IoRemoveOutline, IoAddOutline } from "react-icons/io5";
+import { useNavigate, Link } from "react-router-dom";
+import Header from "../../components/headers/Header";
+import Footer from "../../components/footers/Footer";
+import "../../assets/css/CheckoutInfo.css";
 import {
   getCartItems,
   updateCartItemQuantity,
   removeFromCart,
-  clearCart
-} from '../../utils/cartUtils';
-import api from '../../Api';
-import { formatColorLabel } from '../../utils/colorUtils';
+  clearCart,
+} from "../../utils/cartUtils";
+import api from "../../Api";
+import { formatColorLabel } from "../../utils/colorUtils";
 
 const initialFormState = {
-  firstName: '',
-  lastName: '',
-  phone: '',
-  email: '',
-  streetAddress: '',
-  city: '',
-  country: '',
-  zipcode: ''
+  firstName: "",
+  lastName: "",
+  phone: "",
+  email: "",
+  streetAddress: "",
+  city: "",
+  country: "",
+  zipcode: "",
 };
 
 const CheckoutInfo = () => {
   const navigate = useNavigate();
-  const [shippingMethod, setShippingMethod] = useState('free');
-  const [paymentMethod, setPaymentMethod] = useState('cash');
+  const [shippingMethod, setShippingMethod] = useState("flat");
+  const [paymentMethod, setPaymentMethod] = useState("cash");
   const [cartItems, setCartItems] = useState([]);
   const [formData, setFormData] = useState(initialFormState);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const items = getCartItems();
@@ -71,28 +71,37 @@ const CheckoutInfo = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handlePlaceOrder = async () => {
     if (!cartItems.length) {
-      setErrorMessage('Your cart is empty.');
+      setErrorMessage("Your cart is empty.");
       return;
     }
 
-    const requiredFields = ['firstName', 'lastName', 'phone', 'email', 'streetAddress', 'city', 'country', 'zipcode'];
+    const requiredFields = [
+      "firstName",
+      "lastName",
+      "phone",
+      "email",
+      "streetAddress",
+      "city",
+      "country",
+      "zipcode",
+    ];
     for (const field of requiredFields) {
       if (!formData[field]) {
-        setErrorMessage('Please fill in all required fields.');
+        setErrorMessage("Please fill in all required fields.");
         return;
       }
     }
 
     setIsSubmitting(true);
-    setErrorMessage('');
+    setErrorMessage("");
 
     const payload = {
       sessionId: null,
@@ -107,42 +116,48 @@ const CheckoutInfo = () => {
       paymentMethod,
       shippingMethod,
       totalAmount: total,
-      cartItems: cartItems.map(item => ({
+      cartItems: cartItems.map((item) => ({
         product_id: item.product_id,
         name: item.name,
         size: item.size,
         color: item.color,
-        color_hex: item.color_hex || '',
+        color_hex: item.color_hex || "",
         category: item.category,
         quantity: item.quantity,
         price: item.price,
-        image_url: item.image_url
-      }))
+        image_url: item.image_url,
+      })),
     };
 
     try {
-      const { data } = await api.post('/user/orders', payload);
+      const { data } = await api.post("/user/orders", payload);
       clearCart();
       setCartItems([]);
       setFormData(initialFormState);
-      localStorage.setItem('latestOrder', JSON.stringify(data.order));
-      navigate('/order-complete', { state: { order: data.order } });
+      localStorage.setItem("latestOrder", JSON.stringify(data.order));
+      navigate("/order-complete", { state: { order: data.order } });
     } catch (error) {
-      console.error('Order submission error:', error);
-      setErrorMessage(error.response?.data?.error || 'Failed to place order. Please try again.');
+      console.error("Order submission error:", error);
+      setErrorMessage(
+        error.response?.data?.error ||
+          "Failed to place order. Please try again.",
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   // Calculate totals
-  const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  const shippingCost = shippingMethod === 'flat' ? 12.00 : 0;
+  const subtotal = cartItems.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0,
+  );
+  const shippingCost = shippingMethod === "flat" ? 12.0 : 0;
   const total = subtotal + shippingCost;
 
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return "/images/feature.png";
-    const apiBase = import.meta.env.VITE_API_URL?.replace(/\/$/, '');
+    const apiBase = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
     return apiBase ? `${apiBase}/uploads/${imageUrl}` : `/uploads/${imageUrl}`;
   };
 
@@ -153,7 +168,7 @@ const CheckoutInfo = () => {
     if (item.color_hex) {
       return formatColorLabel(item.color_hex);
     }
-    return 'N/A';
+    return "N/A";
   };
 
   return (
@@ -192,8 +207,8 @@ const CheckoutInfo = () => {
                   <Col md={6} className="mb-3">
                     <Form.Group controlId="firstName">
                       <Form.Label>First Name</Form.Label>
-                      <Form.Control 
-                        type="text" 
+                      <Form.Control
+                        type="text"
                         placeholder="John"
                         name="firstName"
                         value={formData.firstName}
@@ -205,8 +220,8 @@ const CheckoutInfo = () => {
                   <Col md={6} className="mb-3">
                     <Form.Group controlId="lastName">
                       <Form.Label>Last Name</Form.Label>
-                      <Form.Control 
-                        type="text" 
+                      <Form.Control
+                        type="text"
                         placeholder="Doe"
                         name="lastName"
                         value={formData.lastName}
@@ -221,8 +236,8 @@ const CheckoutInfo = () => {
                   <Col md={6} className="mb-3">
                     <Form.Group controlId="phoneNo">
                       <Form.Label>Phone no</Form.Label>
-                      <Form.Control 
-                        type="tel" 
+                      <Form.Control
+                        type="tel"
                         placeholder="+91 9876543210"
                         name="phone"
                         value={formData.phone}
@@ -234,8 +249,8 @@ const CheckoutInfo = () => {
                   <Col md={6} className="mb-3">
                     <Form.Group controlId="emailAddress">
                       <Form.Label>Email Address</Form.Label>
-                      <Form.Control 
-                        type="email" 
+                      <Form.Control
+                        type="email"
                         placeholder="john.doe@example.com"
                         name="email"
                         value={formData.email}
@@ -250,8 +265,8 @@ const CheckoutInfo = () => {
                   <Col md={6} className="mb-3">
                     <Form.Group controlId="streetAddress">
                       <Form.Label>Street Address</Form.Label>
-                      <Form.Control 
-                        type="text" 
+                      <Form.Control
+                        type="text"
                         placeholder="123 Main St"
                         name="streetAddress"
                         value={formData.streetAddress}
@@ -263,8 +278,8 @@ const CheckoutInfo = () => {
                   <Col md={6} className="mb-3">
                     <Form.Group controlId="townCity">
                       <Form.Label>Town/City</Form.Label>
-                      <Form.Control 
-                        type="text" 
+                      <Form.Control
+                        type="text"
                         placeholder="New York"
                         name="city"
                         value={formData.city}
@@ -279,8 +294,8 @@ const CheckoutInfo = () => {
                   <Col md={6} className="mb-3">
                     <Form.Group controlId="country">
                       <Form.Label>Country</Form.Label>
-                      <Form.Control 
-                        type="text" 
+                      <Form.Control
+                        type="text"
                         placeholder="United States"
                         name="country"
                         value={formData.country}
@@ -292,8 +307,8 @@ const CheckoutInfo = () => {
                   <Col md={6} className="mb-3">
                     <Form.Group controlId="zipCode">
                       <Form.Label>Zip Code</Form.Label>
-                      <Form.Control 
-                        type="text" 
+                      <Form.Control
+                        type="text"
                         placeholder="10001"
                         name="zipcode"
                         value={formData.zipcode}
@@ -312,27 +327,43 @@ const CheckoutInfo = () => {
                 <h2 className="summary-title">PRODUCT</h2>
                 <div className="order-product">
                   {cartItems.length === 0 ? (
-                    <div className="empty-order-summary">Your cart is empty</div>
+                    <div className="empty-order-summary">
+                      Your cart is empty
+                    </div>
                   ) : (
                     cartItems.map((item, index) => (
-                        <div className="product-info" key={index}>
-                        <button className="remove-product" onClick={() => handleRemoveItem(index)}>×</button>
-                        <div className="product-image" >
-                          <img src={getImageUrl(item.image_url)} alt={item.name} />
+                      <div className="product-info" key={index}>
+                        <button
+                          className="remove-product"
+                          onClick={() => handleRemoveItem(index)}
+                        >
+                          ×
+                        </button>
+                        <div className="product-image">
+                          <img
+                            src={getImageUrl(item.image_url)}
+                            alt={item.name}
+                          />
                         </div>
-                          <div className="product-details"  >
-                            <h4 className="product-name" style={{ color: '#000' }}>
-                              {item.product_id ? (
-                                <Link
-                                  to={`/product/${item.product_id}`}
-                                  style={{ color: 'inherit', textDecoration: 'none' }}
-                                >
-                                  {item.name}
-                                </Link>
-                              ) : (
-                                item.name
-                              )}
-                            </h4>
+                        <div className="product-details">
+                          <h4
+                            className="product-name"
+                            style={{ color: "#000" }}
+                          >
+                            {item.product_id ? (
+                              <Link
+                                to={`/product/${item.product_id}`}
+                                style={{
+                                  color: "inherit",
+                                  textDecoration: "none",
+                                }}
+                              >
+                                {item.name}
+                              </Link>
+                            ) : (
+                              item.name
+                            )}
+                          </h4>
                           {(item.size || item.color) && (
                             <div className="product-variants">
                               {item.size && <span>Size: {item.size}</span>}
@@ -343,17 +374,26 @@ const CheckoutInfo = () => {
                             </div>
                           )}
                           <div className="quantity-selector">
-                            <button 
-                              className="quantity-btn" 
-                              onClick={() => handleQuantityChange(index, item.quantity - 1)}
+                            <button
+                              className="quantity-btn"
+                              onClick={() =>
+                                handleQuantityChange(index, item.quantity - 1)
+                              }
                               disabled={item.quantity <= 1}
                             >
                               <IoRemoveOutline />
                             </button>
-                            <span className="quantity-value" style={{ color: '#000' }}>{item.quantity}</span>
-                            <button 
-                              className="quantity-btn" 
-                              onClick={() => handleQuantityChange(index, item.quantity + 1)}
+                            <span
+                              className="quantity-value"
+                              style={{ color: "#000" }}
+                            >
+                              {item.quantity}
+                            </span>
+                            <button
+                              className="quantity-btn"
+                              onClick={() =>
+                                handleQuantityChange(index, item.quantity + 1)
+                              }
                             >
                               <IoAddOutline />
                             </button>
@@ -380,29 +420,18 @@ const CheckoutInfo = () => {
 
                   <div className="shipping-option-row">
                     <div className="shipping-option">
-                      <input 
-                        type="radio" 
-                        id="free-shipping" 
-                        name="shipping" 
-                        value="free" 
-                        checked={shippingMethod === 'free'}
+                      <input
+                        type="radio"
+                        id="flat-rate"
+                        name="shipping"
+                        value="flat"
+                        checked={true}
+                        disabled
                         onChange={handleShippingMethodChange}
                       />
-                      <label htmlFor="free-shipping">Free shipping</label>
-                    </div>
-                  </div>
-
-                  <div className="shipping-option-row">
-                    <div className="shipping-option">
-                      <input 
-                        type="radio" 
-                        id="flat-rate" 
-                        name="shipping" 
-                        value="flat" 
-                        checked={shippingMethod === 'flat'}
-                        onChange={handleShippingMethodChange}
-                      />
-                      <label htmlFor="flat-rate">Flat rate: $12.00</label>
+                      <label htmlFor="flat-rate" style={{ color: "#000" }}>
+                        Flat rate: $12.00
+                      </label>
                     </div>
                   </div>
 
@@ -415,42 +444,51 @@ const CheckoutInfo = () => {
                 {/* Payment Methods */}
                 <div className="payment-methods">
                   <div className="payment-option">
-                    <input 
-                      type="radio" 
-                      id="direct-bank" 
-                      name="payment" 
-                      value="bank" 
-                      checked={paymentMethod === 'bank'}
+                    <input
+                      type="radio"
+                      id="direct-bank"
+                      name="payment"
+                      value="bank"
+                      checked={paymentMethod === "bank"}
+                      disabled
                       onChange={handlePaymentMethodChange}
                     />
-                    <label htmlFor="direct-bank">Direct bank transfer</label>
+                    <label htmlFor="direct-bank" style={{ color: "#aaa" }}>
+                      Direct bank transfer (coming soon)
+                    </label>
                   </div>
 
                   <div className="payment-option">
-                    <input 
-                      type="radio" 
-                      id="check-payments" 
-                      name="payment" 
-                      value="check" 
-                      checked={paymentMethod === 'check'}
+                    <input
+                      type="radio"
+                      id="check-payments"
+                      name="payment"
+                      value="check"
+                      checked={paymentMethod === "check"}
+                      disabled
                       onChange={handlePaymentMethodChange}
                     />
-                    <label htmlFor="check-payments">Check payments</label>
+                    <label htmlFor="check-payments" style={{ color: "#aaa" }}>
+                      Check payments (coming soon)
+                    </label>
                   </div>
 
                   <div className="payment-option">
-                    <input 
-                      type="radio" 
-                      id="cash-delivery" 
-                      name="payment" 
-                      value="cash" 
-                      checked={paymentMethod === 'cash'}
+                    <input
+                      type="radio"
+                      id="cash-delivery"
+                      name="payment"
+                      value="cash"
+                      checked={true}
+                      disabled
                       onChange={handlePaymentMethodChange}
                     />
-                    <label htmlFor="cash-delivery">Cash on delivery</label>
+                    <label htmlFor="cash-delivery" style={{ color: "#000" }}>
+                      Cash on delivery
+                    </label>
                   </div>
 
-                  {paymentMethod === 'cash' && (
+                  {paymentMethod === "cash" && (
                     <div className="payment-description">
                       Pay with cash upon delivery.
                     </div>
@@ -467,7 +505,7 @@ const CheckoutInfo = () => {
                       onClick={handlePlaceOrder}
                       disabled={isSubmitting}
                     >
-                      {isSubmitting ? 'PLACING ORDER...' : 'PLACE ORDER'}
+                      {isSubmitting ? "PLACING ORDER..." : "PLACE ORDER"}
                     </button>
                   )}
                 </div>

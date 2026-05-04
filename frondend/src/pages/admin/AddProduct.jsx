@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Alert } from 'react-bootstrap';
-import { FaSignOutAlt, FaTimes } from 'react-icons/fa';
-import '../../assets/css/admin/AddProduct.css';
-import { useNavigate, useParams } from 'react-router-dom';
-import api from '../../Api';
+import React, { useState, useEffect } from "react";
+import { Container, Alert } from "react-bootstrap";
+import { FaSignOutAlt, FaTimes } from "react-icons/fa";
+import "../../assets/css/admin/AddProduct.css";
+import { useNavigate, useParams } from "react-router-dom";
+import api from "../../Api";
 
-const SIZE_KEYS = ['XS', 'S', 'M', 'L', 'XL'];
+const SIZE_KEYS = ["XS", "S", "M", "L", "XL"];
 
 const createInitialSelectedSizes = () =>
   SIZE_KEYS.reduce((acc, key) => ({ ...acc, [key]: false }), {});
@@ -17,36 +17,40 @@ const createInitialSizeColorInputs = () =>
   SIZE_KEYS.reduce(
     (acc, key) => ({
       ...acc,
-      [key]: { color: '#000000', quantity: '' }
+      [key]: { color: "", quantity: "" },
     }),
-    {}
+    {},
   );
 
 const AddProduct = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [activeSection, setActiveSection] = useState('Suits');
+  const [activeSection, setActiveSection] = useState("Suits");
   const [images, setImages] = useState([null, null, null, null]);
   const [imageFiles, setImageFiles] = useState([null, null, null, null]);
   const [productData, setProductData] = useState({
-    name: '',
-    price: '',
-    category: 'Suits',
-    description1: '',
-    description2: '',
-    description3: '',
-    collection: '',
-    material: '',
-    technique: '',
-    packaging: '',
-    featureProduct: false
+    name: "",
+    price: "",
+    category: "Suits",
+    description1: "",
+    description2: "",
+    description3: "",
+    collection: "",
+    material: "",
+    technique: "",
+    packaging: "",
+    featureProduct: false,
   });
-  const [selectedSizes, setSelectedSizes] = useState(() => createInitialSelectedSizes());
+  const [selectedSizes, setSelectedSizes] = useState(() =>
+    createInitialSelectedSizes(),
+  );
   const [sizeColors, setSizeColors] = useState(() => createInitialSizeColors());
-  const [sizeColorInputs, setSizeColorInputs] = useState(() => createInitialSizeColorInputs());
+  const [sizeColorInputs, setSizeColorInputs] = useState(() =>
+    createInitialSizeColorInputs(),
+  );
   const [colors, setColors] = useState([]);
-  const [colorInput, setColorInput] = useState('');
-  const [status, setStatus] = useState({ type: '', message: '' });
+  const [colorInput, setColorInput] = useState("");
+  const [status, setStatus] = useState({ type: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
 
@@ -74,7 +78,7 @@ const AddProduct = () => {
     const { name, value, type, checked } = e.target;
     setProductData({
       ...productData,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     });
   };
 
@@ -85,12 +89,12 @@ const AddProduct = () => {
         setSizeColors((prevColors) => ({ ...prevColors, [size]: [] }));
         setSizeColorInputs((prevInputs) => ({
           ...prevInputs,
-          [size]: { color: '#000000', quantity: '' }
+          [size]: { color: "#000000", quantity: "" },
         }));
       }
       return {
         ...prev,
-        [size]: nextValue
+        [size]: nextValue,
       };
     });
   };
@@ -100,44 +104,53 @@ const AddProduct = () => {
       ...prev,
       [size]: {
         ...prev[size],
-        [field]: field === 'quantity' ? value.replace(/[^0-9]/g, '') : value
-      }
+        [field]: field === "quantity" ? value.replace(/[^0-9]/g, "") : value,
+      },
     }));
   };
 
   const handleAddSizeColor = (size) => {
     const { color, quantity } = sizeColorInputs[size];
     if (!color) {
-      setStatus({ type: 'error', message: 'Please choose a color for this size.' });
+      setStatus({
+        type: "error",
+        message: "Please choose a color for this size.",
+      });
       return;
     }
     const numericQuantity = Number(quantity);
     if (!quantity || numericQuantity <= 0) {
-      setStatus({ type: 'error', message: 'Enter a valid quantity for the selected color.' });
+      setStatus({
+        type: "error",
+        message: "Enter a valid quantity for the selected color.",
+      });
       return;
     }
 
     if (sizeColors[size].some((entry) => entry.color === color)) {
-      setStatus({ type: 'error', message: 'This color is already added for the selected size.' });
+      setStatus({
+        type: "error",
+        message: "This color is already added for the selected size.",
+      });
       return;
     }
 
     setSizeColors((prev) => ({
       ...prev,
-      [size]: [...prev[size], { color, quantity: String(numericQuantity) }]
+      [size]: [...prev[size], { color, quantity: String(numericQuantity) }],
     }));
 
     setSizeColorInputs((prev) => ({
       ...prev,
-      [size]: { color: '#000000', quantity: '' }
+      [size]: { color: "", quantity: "" },
     }));
-    setStatus({ type: '', message: '' });
+    setStatus({ type: "", message: "" });
   };
 
   const handleRemoveSizeColor = (size, indexToRemove) => {
     setSizeColors((prev) => ({
       ...prev,
-      [size]: prev[size].filter((_, index) => index !== indexToRemove)
+      [size]: prev[size].filter((_, index) => index !== indexToRemove),
     }));
   };
 
@@ -146,17 +159,17 @@ const AddProduct = () => {
       ...prev,
       [size]: prev[size].map((entry, index) =>
         index === indexToUpdate
-          ? { ...entry, quantity: value.replace(/[^0-9]/g, '') }
-          : entry
-      )
+          ? { ...entry, quantity: value.replace(/[^0-9]/g, "") }
+          : entry,
+      ),
     }));
   };
 
   const handleColorAdd = (e) => {
-    if (e.key === 'Enter' && colorInput.trim() !== '') {
+    if (e.key === "Enter" && colorInput.trim() !== "") {
       e.preventDefault();
       setColors([...colors, colorInput.trim()]);
-      setColorInput('');
+      setColorInput("");
     }
   };
 
@@ -166,9 +179,9 @@ const AddProduct = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('isAdmin');
-    window.history.replaceState(null, '', '/');
-    navigate('/', { replace: true });
+    localStorage.removeItem("isAdmin");
+    window.history.replaceState(null, "", "/");
+    navigate("/", { replace: true });
   };
 
   // Load product for edit mode
@@ -176,36 +189,41 @@ const AddProduct = () => {
     const loadProduct = async () => {
       if (!id) return;
       setIsEditMode(true);
-      setStatus({ type: '', message: '' });
+      setStatus({ type: "", message: "" });
 
       try {
         const res = await api.get(`/admin/product/${id}`);
-        const { product, images: imageUrls, colors: colorList, sizes: sizeList } = res.data;
+        const {
+          product,
+          images: imageUrls,
+          colors: colorList,
+          sizes: sizeList,
+        } = res.data;
 
         setProductData({
-          name: product.name || '',
-          price: product.price || '',
-          category: product.category || 'Suits',
-          description1: product.description1 || '',
-          description2: product.description2 || '',
-          description3: product.description3 || '',
-          collection: product.collection || '',
-          material: product.material || '',
-          technique: product.technique || '',
-          packaging: product.packaging || '',
-          featureProduct: !!product.is_featured
+          name: product.name || "",
+          price: product.price || "",
+          category: product.category || "Suits",
+          description1: product.description1 || "",
+          description2: product.description2 || "",
+          description3: product.description3 || "",
+          collection: product.collection || "",
+          material: product.material || "",
+          technique: product.technique || "",
+          packaging: product.packaging || "",
+          featureProduct: !!product.is_featured,
         });
 
         // Images: use absolute URLs for preview; existing files remain on server until replaced
-        const apiBase = import.meta.env.VITE_API_URL?.replace(/\/$/, '');
+        const apiBase = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
         const previewImages = (imageUrls || []).map((file) =>
-          apiBase ? `${apiBase}/uploads/${file}` : `/uploads/${file}`
+          apiBase ? `${apiBase}/uploads/${file}` : `/uploads/${file}`,
         );
         setImages([
           previewImages[0] || null,
           previewImages[1] || null,
           previewImages[2] || null,
-          previewImages[3] || null
+          previewImages[3] || null,
         ]);
         setImageFiles([null, null, null, null]);
 
@@ -224,15 +242,16 @@ const AddProduct = () => {
           baseSizeColors[key] = (sizeObj.colors || [])
             .map((colorEntry) => {
               if (!colorEntry) return null;
-              if (typeof colorEntry === 'string') {
-                return { color: colorEntry, quantity: '' };
+              if (typeof colorEntry === "string") {
+                return { color: colorEntry, quantity: "" };
               }
               return {
-                color: colorEntry.color || colorEntry.color_name || '',
+                color: colorEntry.color || colorEntry.color_name || "",
                 quantity:
-                  colorEntry.quantity !== undefined && colorEntry.quantity !== null
+                  colorEntry.quantity !== undefined &&
+                  colorEntry.quantity !== null
                     ? String(colorEntry.quantity)
-                    : ''
+                    : "",
               };
             })
             .filter((entry) => entry.color);
@@ -242,8 +261,9 @@ const AddProduct = () => {
         setSizeColors(baseSizeColors);
         setSizeColorInputs(createInitialSizeColorInputs());
       } catch (error) {
-        const message = error?.response?.data?.error || 'Failed to load product for editing.';
-        setStatus({ type: 'error', message });
+        const message =
+          error?.response?.data?.error || "Failed to load product for editing.";
+        setStatus({ type: "error", message });
       }
     };
 
@@ -252,17 +272,17 @@ const AddProduct = () => {
 
   const resetForm = () => {
     setProductData({
-      name: '',
-      price: '',
-      category: 'Suits',
-      description1: '',
-      description2: '',
-      description3: '',
-      collection: '',
-      material: '',
-      technique: '',
-      packaging: '',
-      featureProduct: false
+      name: "",
+      price: "",
+      category: "Suits",
+      description1: "",
+      description2: "",
+      description3: "",
+      collection: "",
+      material: "",
+      technique: "",
+      packaging: "",
+      featureProduct: false,
     });
     setImages([null, null, null, null]);
     setImageFiles([null, null, null, null]);
@@ -270,25 +290,26 @@ const AddProduct = () => {
     setSizeColors(createInitialSizeColors());
     setSizeColorInputs(createInitialSizeColorInputs());
     setColors([]);
-    setColorInput('');
+    setColorInput("");
     setIsEditMode(false);
   };
 
   const validateForm = () => {
     const requiredFields = [
-      'name',
-      'price',
-      'description1',
-      'description2',
-      'description3',
-      'collection',
-      'material',
-      'technique',
-      'packaging'
+      "name",
+      "price",
+      "description1",
+      "description2",
+      "description3",
+      "collection",
+      "material",
+      "technique",
+      "packaging",
     ];
 
     const hasBasicFields = requiredFields.every(
-      (field) => productData[field] && productData[field].toString().trim() !== ''
+      (field) =>
+        productData[field] && productData[field].toString().trim() !== "",
     );
 
     if (!hasBasicFields) {
@@ -310,7 +331,9 @@ const AddProduct = () => {
       }
     }
 
-    const selectedSizeEntries = Object.entries(selectedSizes).filter(([, isChecked]) => isChecked);
+    const selectedSizeEntries = Object.entries(selectedSizes).filter(
+      ([, isChecked]) => isChecked,
+    );
     if (selectedSizeEntries.length === 0) {
       return false;
     }
@@ -322,16 +345,13 @@ const AddProduct = () => {
       }
 
       const hasInvalidColor = colorsForSize.some(
-        (entry) => !entry.color || !entry.quantity || Number(entry.quantity) <= 0
+        (entry) =>
+          !entry.color || !entry.quantity || Number(entry.quantity) <= 0,
       );
 
       if (hasInvalidColor) {
         return false;
       }
-    }
-
-    if (colors.length === 0) {
-      return false;
     }
 
     return true;
@@ -340,32 +360,32 @@ const AddProduct = () => {
   const handleSubmit = async () => {
     if (!validateForm()) {
       setStatus({
-        type: 'error',
-        message: 'Please input all the data before submitting'
+        type: "error",
+        message: "Please input all the data before submitting",
       });
       return;
     }
 
-    setStatus({ type: '', message: '' });
+    setStatus({ type: "", message: "" });
     setIsSubmitting(true);
 
     const formData = new FormData();
 
-    formData.append('name', productData.name);
-    formData.append('price', productData.price);
-    formData.append('category', productData.category);
-    formData.append('description1', productData.description1);
-    formData.append('description2', productData.description2);
-    formData.append('description3', productData.description3);
-    formData.append('collection', productData.collection);
-    formData.append('material', productData.material);
-    formData.append('technique', productData.technique);
-    formData.append('packaging', productData.packaging);
-    formData.append('is_featured', productData.featureProduct ? 1 : 0);
+    formData.append("name", productData.name);
+    formData.append("price", productData.price);
+    formData.append("category", productData.category);
+    formData.append("description1", productData.description1);
+    formData.append("description2", productData.description2);
+    formData.append("description3", productData.description3);
+    formData.append("collection", productData.collection);
+    formData.append("material", productData.material);
+    formData.append("technique", productData.technique);
+    formData.append("packaging", productData.packaging);
+    formData.append("is_featured", productData.featureProduct ? 1 : 0);
 
     imageFiles.forEach((file) => {
       if (file) {
-        formData.append('images', file);
+        formData.append("images", file);
       }
     });
 
@@ -375,34 +395,36 @@ const AddProduct = () => {
         size: sizeKey,
         colors: sizeColors[sizeKey].map(({ color, quantity }) => ({
           color,
-          quantity: Number(quantity) || 0
-        }))
+          quantity: Number(quantity) || 0,
+        })),
       }));
 
-    formData.append('colors', JSON.stringify(colors));
-    formData.append('sizes', JSON.stringify(sizesPayload));
+    formData.append("colors", JSON.stringify(colors));
+    formData.append("sizes", JSON.stringify(sizesPayload));
 
     try {
-      await api.post('/admin/add-product', formData, {
+      await api.post("/admin/add-product", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       setStatus({
-        type: 'success',
-        message: 'Product added successfully!'
+        type: "success",
+        message: "Product added successfully!",
       });
       resetForm();
       // Navigate to shirt-view after successful submission
       setTimeout(() => {
-        navigate('/admin/shirt-view');
+        navigate("/admin/shirt-view");
       }, 1000);
     } catch (error) {
-      const message = error?.response?.data?.error || 'Failed to add product. Please try again.';
+      const message =
+        error?.response?.data?.error ||
+        "Failed to add product. Please try again.";
       setStatus({
-        type: 'error',
-        message
+        type: "error",
+        message,
       });
     } finally {
       setIsSubmitting(false);
@@ -414,32 +436,32 @@ const AddProduct = () => {
 
     if (!validateForm()) {
       setStatus({
-        type: 'error',
-        message: 'Please input all the data before submitting'
+        type: "error",
+        message: "Please input all the data before submitting",
       });
       return;
     }
 
-    setStatus({ type: '', message: '' });
+    setStatus({ type: "", message: "" });
     setIsSubmitting(true);
 
     const formData = new FormData();
 
-    formData.append('name', productData.name);
-    formData.append('price', productData.price);
-    formData.append('category', productData.category);
-    formData.append('description1', productData.description1);
-    formData.append('description2', productData.description2);
-    formData.append('description3', productData.description3);
-    formData.append('collection', productData.collection);
-    formData.append('material', productData.material);
-    formData.append('technique', productData.technique);
-    formData.append('packaging', productData.packaging);
-    formData.append('is_featured', productData.featureProduct ? 1 : 0);
+    formData.append("name", productData.name);
+    formData.append("price", productData.price);
+    formData.append("category", productData.category);
+    formData.append("description1", productData.description1);
+    formData.append("description2", productData.description2);
+    formData.append("description3", productData.description3);
+    formData.append("collection", productData.collection);
+    formData.append("material", productData.material);
+    formData.append("technique", productData.technique);
+    formData.append("packaging", productData.packaging);
+    formData.append("is_featured", productData.featureProduct ? 1 : 0);
 
     imageFiles.forEach((file) => {
       if (file) {
-        formData.append('images', file);
+        formData.append("images", file);
       }
     });
 
@@ -449,33 +471,35 @@ const AddProduct = () => {
         size: sizeKey,
         colors: sizeColors[sizeKey].map(({ color, quantity }) => ({
           color,
-          quantity: Number(quantity) || 0
-        }))
+          quantity: Number(quantity) || 0,
+        })),
       }));
 
-    formData.append('colors', JSON.stringify(colors));
-    formData.append('sizes', JSON.stringify(sizesPayload));
+    formData.append("colors", JSON.stringify(colors));
+    formData.append("sizes", JSON.stringify(sizesPayload));
 
     try {
       await api.put(`/admin/update-product/${id}`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       setStatus({
-        type: 'success',
-        message: 'Product updated successfully!'
+        type: "success",
+        message: "Product updated successfully!",
       });
       // Navigate to shirt-view after successful update
       setTimeout(() => {
-        navigate('/admin/shirt-view');
+        navigate("/admin/shirt-view");
       }, 1000);
     } catch (error) {
-      const message = error?.response?.data?.error || 'Failed to update product. Please try again.';
+      const message =
+        error?.response?.data?.error ||
+        "Failed to update product. Please try again.";
       setStatus({
-        type: 'error',
-        message
+        type: "error",
+        message,
       });
     } finally {
       setIsSubmitting(false);
@@ -483,7 +507,7 @@ const AddProduct = () => {
   };
 
   const handleCancel = () => {
-    console.log('Cancel');
+    console.log("Cancel");
     // Add cancel logic here
     navigate(-1);
   };
@@ -496,23 +520,23 @@ const AddProduct = () => {
           <div className="sidebar-logo">
             <img src="/images/brandlogo.png" alt="Tailor Lab Logo" />
           </div>
-          
+
           <nav className="sidebar-nav">
-            <div 
-              className={`nav-item ${activeSection === 'Suits' ? 'active' : ''}`}
-              onClick={() => navigate('/admin/shirt-view')}
+            <div
+              className={`nav-item ${activeSection === "Suits" ? "active" : ""}`}
+              onClick={() => navigate("/admin/shirt-view")}
             >
               Suits
             </div>
-            <div 
-              className={`nav-item ${activeSection === 'Shirts' ? 'active' : ''}`}
-              onClick={() => navigate('/admin/shirt-view')}
+            <div
+              className={`nav-item ${activeSection === "Shirts" ? "active" : ""}`}
+              onClick={() => navigate("/admin/shirt-view")}
             >
               Shirts
             </div>
-            <div 
-              className={`nav-item ${activeSection === 'Trousers' ? 'active' : ''}`}
-              onClick={() => navigate('/admin/shirt-view')}
+            <div
+              className={`nav-item ${activeSection === "Trousers" ? "active" : ""}`}
+              onClick={() => navigate("/admin/shirt-view")}
             >
               Trousers
             </div>
@@ -530,9 +554,14 @@ const AddProduct = () => {
       {/* Main Content */}
       <main className="admin-main-content">
         <Container fluid className="admin-container">
-          <h1 className="page-heading">{isEditMode ? 'Edit Product' : 'Add New Product'}</h1>
+          <h1 className="page-heading">
+            {isEditMode ? "Edit Product" : "Add New Product"}
+          </h1>
           {status.message && (
-            <Alert variant={status.type === 'success' ? 'success' : 'danger'} className="mb-4">
+            <Alert
+              variant={status.type === "success" ? "success" : "danger"}
+              className="mb-4"
+            >
               {status.message}
             </Alert>
           )}
@@ -546,7 +575,7 @@ const AddProduct = () => {
                   {image ? (
                     <div className="image-preview">
                       <img src={image} alt={`Upload ${index + 1}`} />
-                      <button 
+                      <button
                         className="remove-image-btn"
                         onClick={() => {
                           const newImages = [...images];
@@ -567,7 +596,7 @@ const AddProduct = () => {
                         type="file"
                         accept="image/*"
                         onChange={(e) => handleImageUpload(index, e)}
-                        style={{ display: 'none' }}
+                        style={{ display: "none" }}
                       />
                       <div className="upload-icon">+</div>
                       <span>Upload Image</span>
@@ -677,19 +706,43 @@ const AddProduct = () => {
                     <div className="size-details">
                       <div className="size-colors-section">
                         <div className="color-picker-controls">
-                          <label className="color-picker-label">Choose Color:</label>
+                          <label
+                            className="color-picker-label"
+                            style={{ marginRight: "10px" }}
+                          >
+                            Color Name:
+                          </label>
                           <input
-                            type="color"
+                            type="text"
+                            placeholder="e.g. Red, Blue"
                             value={sizeColorInputs[size].color}
-                            onChange={(e) => handleSizeColorInputChange(size, 'color', e.target.value)}
-                            className="color-picker-input"
+                            onChange={(e) =>
+                              handleSizeColorInputChange(
+                                size,
+                                "color",
+                                e.target.value,
+                              )
+                            }
+                            className="color-input-text"
+                            style={{
+                              padding: "5px",
+                              borderRadius: "4px",
+                              border: "1px solid #ccc",
+                              marginRight: "10px",
+                            }}
                           />
                           <input
                             type="number"
                             min="1"
                             placeholder="Quantity"
                             value={sizeColorInputs[size].quantity}
-                            onChange={(e) => handleSizeColorInputChange(size, 'quantity', e.target.value)}
+                            onChange={(e) =>
+                              handleSizeColorInputChange(
+                                size,
+                                "quantity",
+                                e.target.value,
+                              )
+                            }
                             className="quantity-input"
                           />
                           <button
@@ -703,24 +756,39 @@ const AddProduct = () => {
                         {sizeColors[size].length > 0 && (
                           <div className="size-color-tags">
                             {sizeColors[size].map((entry, index) => (
-                              <span key={`${entry.color}-${index}`} className="size-color-tag">
+                              <span
+                                key={`${entry.color}-${index}`}
+                                className="size-color-tag"
+                              >
                                 <span
-                                  className="color-circle"
-                                  style={{ backgroundColor: entry.color }}
-                                ></span>
+                                  className="color-name-display"
+                                  style={{
+                                    marginRight: "10px",
+                                    color: "#fff",
+                                    fontWeight: "bold",
+                                  }}
+                                >
+                                  {entry.color}
+                                </span>
                                 <input
                                   type="number"
                                   min="0"
                                   className="quantity-input"
                                   value={entry.quantity}
                                   onChange={(e) =>
-                                    handleSizeColorQuantityChange(size, index, e.target.value)
+                                    handleSizeColorQuantityChange(
+                                      size,
+                                      index,
+                                      e.target.value,
+                                    )
                                   }
                                 />
                                 <button
                                   type="button"
                                   className="remove-size-color-btn"
-                                  onClick={() => handleRemoveSizeColor(size, index)}
+                                  onClick={() =>
+                                    handleRemoveSizeColor(size, index)
+                                  }
                                 >
                                   ❌
                                 </button>
@@ -736,35 +804,7 @@ const AddProduct = () => {
             </div>
           </div>
 
-          {/* Colors Section */}
-          <div className="form-section">
-            <h3 className="section-title">Colors</h3>
-            <div className="colors-container">
-              <input
-                type="text"
-                value={colorInput}
-                onChange={(e) => setColorInput(e.target.value)}
-                onKeyDown={handleColorAdd}
-                placeholder="Type color name and press Enter"
-                className="color-input"
-              />
-              <div className="color-tags">
-                {colors.map((color, index) => (
-                  <span key={index} className="color-tag">
-                    {color}
-                    <button
-                      className="remove-color-btn"
-                      onClick={() => handleColorRemove(index)}
-                    >
-                      ❌
-                    </button>
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Additional Information Section */}
+          {/* Additional Information Section (Global Colors Removed) */}
           <div className="form-section">
             <h3 className="section-title">Additional Information</h3>
             <div className="additional-info-container">
@@ -816,14 +856,13 @@ const AddProduct = () => {
                   />
                 </div>
               </div>
-              
             </div>
           </div>
 
           {/* Action Buttons Section */}
           <div className="form-section action-buttons-section">
             <div className="action-buttons-row">
-            <div className="form-row">
+              <div className="form-row">
                 <div className="form-group ">
                   <label className="checkbox-label">
                     <input
@@ -843,7 +882,7 @@ const AddProduct = () => {
                   onClick={handleUpdate}
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Updating...' : 'Update'}
+                  {isSubmitting ? "Updating..." : "Update"}
                 </button>
               )}
               {!isEditMode && (
@@ -852,7 +891,7 @@ const AddProduct = () => {
                   onClick={handleSubmit}
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Submitting...' : 'Submit'}
+                  {isSubmitting ? "Submitting..." : "Submit"}
                 </button>
               )}
               <button className="action-btn cancel-btn" onClick={handleCancel}>
@@ -867,4 +906,3 @@ const AddProduct = () => {
 };
 
 export default AddProduct;
-

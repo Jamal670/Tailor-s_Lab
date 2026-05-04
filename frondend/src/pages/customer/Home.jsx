@@ -97,11 +97,15 @@ const Home = () => {
 
       {/* Hero Section */}
       <section className="hero-section" id="home">
+        <video className="hero-video" autoPlay muted loop playsInline>
+          <source src="/images/home_video.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
         <div className="hero-content">
           <div className="hero-text">
-            <p className="couture">Signature</p>
-            <h1 className="suits">SUITS</h1>
-            <Button variant="light" className="shop-now-btnn" onClick={scrollToCollection}>Shop Now</Button>
+            <h6 className="hero-subtitle">TAILOR&apos;S LAB</h6>
+            <p className="hero-heading">Crafted for Legends</p>
+            <Button variant="light" className="shop-now-btnnn" onClick={scrollToCollection}>Shop Now</Button>
           </div>
         </div>
       </section>

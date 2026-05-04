@@ -3,7 +3,13 @@ const app = express();
 const cors = require("cors");
 const adminRoutes = require("./routes/adminRoutes");
 const userRoutes = require("./routes/userRoutes");
+const connectDB = require("./config/db");
+
 require("dotenv").config();
+
+// Connect to MongoDB
+connectDB();
+
 
 // CORS FIX
 app.use(cors({

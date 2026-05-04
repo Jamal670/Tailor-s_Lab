@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Form, Button } from 'react-bootstrap';
-import { IoRemoveOutline, IoAddOutline } from 'react-icons/io5';
-import { Link } from 'react-router-dom';
-import Header from '../../components/headers/Header';
-import Footer from '../../components/footers/Footer';
-import '../../assets/css/checkout.css';
-import { 
-  getCartItems, 
-  getCartTotal, 
-  removeFromCart, 
-  updateCartItemQuantity 
-} from '../../utils/cartUtils';
-import { formatColorLabel } from '../../utils/colorUtils';
+import React, { useState, useEffect } from "react";
+import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { IoRemoveOutline, IoAddOutline } from "react-icons/io5";
+import { Link } from "react-router-dom";
+import Header from "../../components/headers/Header";
+import Footer from "../../components/footers/Footer";
+import "../../assets/css/checkout.css";
+import {
+  getCartItems,
+  getCartTotal,
+  removeFromCart,
+  updateCartItemQuantity,
+} from "../../utils/cartUtils";
+import { formatColorLabel } from "../../utils/colorUtils";
 
 const Checkout = () => {
   const [cartItems, setCartItems] = useState([]);
-  const [couponCode, setCouponCode] = useState('');
-  const [shippingMethod, setShippingMethod] = useState('free');
+  const [couponCode, setCouponCode] = useState("");
+  const [shippingMethod, setShippingMethod] = useState("flat");
 
   useEffect(() => {
     const items = getCartItems();
@@ -50,7 +50,7 @@ const Checkout = () => {
   };
 
   const applyCoupon = () => {
-    console.log('Applying coupon:', couponCode);
+    console.log("Applying coupon:", couponCode);
     // Implement coupon logic here
   };
 
@@ -59,13 +59,16 @@ const Checkout = () => {
   };
 
   // Calculate totals
-  const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  const shippingCost = shippingMethod === 'flat' ? 12.00 : 0;
+  const subtotal = cartItems.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0,
+  );
+  const shippingCost = shippingMethod === "flat" ? 12.0 : 0;
   const total = subtotal + shippingCost;
 
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return "/images/feature.png";
-    const apiBase = import.meta.env.VITE_API_URL?.replace(/\/$/, '');
+    const apiBase = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
     return apiBase ? `${apiBase}/uploads/${imageUrl}` : `/uploads/${imageUrl}`;
   };
 
@@ -76,7 +79,7 @@ const Checkout = () => {
     if (item.color_hex) {
       return formatColorLabel(item.color_hex);
     }
-    return 'N/A';
+    return "N/A";
   };
 
   return (
@@ -123,23 +126,36 @@ const Checkout = () => {
                   <tbody>
                     {cartItems.length === 0 ? (
                       <tr>
-                        <td colSpan="4" className="empty-cart-row">Your cart is empty</td>
+                        <td colSpan="4" className="empty-cart-row">
+                          Your cart is empty
+                        </td>
                       </tr>
                     ) : (
                       cartItems.map((item, index) => (
                         <tr className="product-row" key={index}>
                           <td className="product-col">
                             <div className="product-info">
-                              <button className="remove-product" onClick={() => handleRemoveItem(index)}>×</button>
+                              <button
+                                className="remove-product"
+                                onClick={() => handleRemoveItem(index)}
+                              >
+                                ×
+                              </button>
                               <div className="product-image">
-                                <img src={getImageUrl(item.image_url)} alt={item.name} />
+                                <img
+                                  src={getImageUrl(item.image_url)}
+                                  alt={item.name}
+                                />
                               </div>
                               <div className="product-details-block">
                                 <div className="product-name">
                                   {item.product_id ? (
                                     <Link
                                       to={`/product/${item.product_id}`}
-                                      style={{ color: 'inherit', textDecoration: 'none' }}
+                                      style={{
+                                        color: "inherit",
+                                        textDecoration: "none",
+                                      }}
                                     >
                                       {item.name}
                                     </Link>
@@ -149,36 +165,63 @@ const Checkout = () => {
                                 </div>
                                 {(item.size || item.color) && (
                                   <div className="product-variants">
-                                    {item.size && <span>Size: {item.size}</span>}
-                                    {item.size && item.color && <span> • </span>}
+                                    {item.size && (
+                                      <span>Size: {item.size}</span>
+                                    )}
+                                    {item.size && item.color && (
+                                      <span> • </span>
+                                    )}
                                     {(item.color || item.color_hex) && (
-                                      <span>Color: {getDisplayColor(item)}</span>
+                                      <span>
+                                        Color: {getDisplayColor(item)}
+                                      </span>
                                     )}
                                   </div>
                                 )}
                               </div>
                             </div>
                           </td>
-                          <td className="price-col">${Number(item.price).toFixed(2)}</td>
+                          <td className="price-col">
+                            ${Number(item.price).toFixed(2)}
+                          </td>
                           <td className="quantity-col">
-                            <div className="quantity-selector" style={{ border: '1px solid #E2D9C8' }}>
-                              <button 
-                                className="quantity-btn" style={{ border: '1px solid #E2D9C8', color: '#E2D9C8' }}  
-                                onClick={() => handleQuantityChange(index, item.quantity - 1)}
+                            <div
+                              className="quantity-selector"
+                              style={{ border: "1px solid #E2D9C8" }}
+                            >
+                              <button
+                                className="quantity-btn"
+                                style={{
+                                  border: "1px solid #E2D9C8",
+                                  color: "#E2D9C8",
+                                }}
+                                onClick={() =>
+                                  handleQuantityChange(index, item.quantity - 1)
+                                }
                                 disabled={item.quantity <= 1}
                               >
                                 <IoRemoveOutline />
                               </button>
-                              <span className="quantity-value">{item.quantity}</span>
-                              <button 
-                                className="quantity-btn " style={{ border: '1px solid #E2D9C8', color: '#E2D9C8' }}  
-                                onClick={() => handleQuantityChange(index, item.quantity + 1)}
+                              <span className="quantity-value">
+                                {item.quantity}
+                              </span>
+                              <button
+                                className="quantity-btn "
+                                style={{
+                                  border: "1px solid #E2D9C8",
+                                  color: "#E2D9C8",
+                                }}
+                                onClick={() =>
+                                  handleQuantityChange(index, item.quantity + 1)
+                                }
                               >
                                 <IoAddOutline />
                               </button>
                             </div>
                           </td>
-                          <td className="subtotal-col">${(item.price * item.quantity).toFixed(2)}</td>
+                          <td className="subtotal-col">
+                            ${(item.price * item.quantity).toFixed(2)}
+                          </td>
                         </tr>
                       ))
                     )}
@@ -188,10 +231,10 @@ const Checkout = () => {
 
               {/* Coupon Code */}
               <div className="coupon-container">
-                <input 
-                  type="text" 
-                  className="coupon-input" 
-                  placeholder="Coupon Code" 
+                <input
+                  type="text"
+                  className="coupon-input"
+                  placeholder="Coupon Code"
                   value={couponCode}
                   onChange={handleCouponChange}
                 />
@@ -205,66 +248,49 @@ const Checkout = () => {
               {/* Cart Totals */}
               <div className="cart-totals">
                 <h2 className="totals-title">CART TOTALS</h2>
-                
+
                 <div className="totals-row subtotal-row">
                   <span className="totals-label">Subtotal</span>
                   <span className="totals-value">${subtotal.toFixed(2)}</span>
                 </div>
-                
+
                 <div className="totals-row shipping-row">
                   <span className="totals-label">Shipping</span>
                 </div>
-                
+
                 <div className="shipping-option-row">
                   <div className="shipping-option">
-                    <input 
-                      type="radio" 
-                      id="free-shipping" 
-                      name="shipping" 
-                      value="free" 
-                      checked={shippingMethod === 'free'}
+                    <input
+                      type="radio"
+                      id="flat-rate"
+                      name="shipping"
+                      value="flat"
+                      checked={true}
+                      disabled
                       onChange={handleShippingMethodChange}
                     />
-                    <label htmlFor="free-shipping">Free shipping</label>
+                    <label htmlFor="flat-rate" style={{ color: "#000" }}>
+                      Flat rate: $12.00
+                    </label>
                   </div>
                 </div>
-                
+
                 <div className="shipping-option-row">
-                  <div className="shipping-option">
-                    <input 
-                      type="radio" 
-                      id="flat-rate" 
-                      name="shipping" 
-                      value="flat" 
-                      checked={shippingMethod === 'flat'}
-                      onChange={handleShippingMethodChange}
-                    />
-                    <label htmlFor="flat-rate">Flat rate: $12.00</label>
-                  </div>
+                  <div className="shipping-destination">Shipping to CA.</div>
                 </div>
-                
+
                 <div className="shipping-option-row">
-                  <div className="shipping-destination">
-                    Shipping to CA.
-                  </div>
+                  <div className="contact-info-destination">Change address</div>
                 </div>
-                
-                <div className="shipping-option-row">
-                <div className="contact-info-destination">
-                Change address
-                  </div>
-                </div>
-                
+
                 <div className="totals-row total-row">
                   <span className="totals-label">Total</span>
                   <span className="totals-value">${total.toFixed(2)}</span>
                 </div>
-                
-                  <a href="/cart/checkout-info">
-                    <button className="proceed-btn">
-                      PROCEED TO CHECKOUT
-                    </button>
-                  </a>
+
+                <a href="/cart/checkout-info">
+                  <button className="proceed-btn">PROCEED TO CHECKOUT</button>
+                </a>
               </div>
             </Col>
           </Row>

@@ -1,16 +1,15 @@
-// backend/dbconfig.js
-const mysql = require("mysql");
+// backend/config/db.js
+const mongoose = require("mongoose");
+require("dotenv").config();
 
-const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "tailor"
-});
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGO_URI);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+  }
+};
 
-db.connect((err) => {
-    if (err) throw err;
-    console.log("MySQL Connected!");
-});
-
-module.exports = db;
+module.exports = connectDB;

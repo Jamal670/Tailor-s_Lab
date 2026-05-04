@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import ScrollToTop from "./components/ScrollToTop";
 import Home from "./pages/customer/Home";
 import SuitCategoryPage from "./pages/customer/SuitCategoryPage";
 import ShirtCategory from "./pages/customer/ShirtCategory";
@@ -15,13 +16,15 @@ import ShirtView from "./pages/admin/ShirtView";
 import AddProduct from "./pages/admin/AddProduct";
 
 const PrivateAdminRoute = ({ children }) => {
-  const isAdmin = typeof window !== 'undefined' && localStorage.getItem("isAdmin") === "true";
+  const isAdmin =
+    typeof window !== "undefined" && localStorage.getItem("isAdmin") === "true";
   return isAdmin ? children : <Navigate to="/admin-login" replace />;
 };
 
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/suits" element={<SuitCategoryPage />} />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
+import { BsCart2 } from 'react-icons/bs';
 import { FaShoppingCart, FaFacebookF, FaPinterestP, FaLinkedinIn, FaInstagram } from 'react-icons/fa';
 import Header from '../../components/headers/Header';
 import Footer from '../../components/footers/Footer';
@@ -380,7 +381,7 @@ const Product = () => {
                         
                         
                         <Button className="add-to-cart-btn" variant="dark" onClick={handleAddToCart}>
-                          <FaShoppingCart /> Add to cart
+                          <BsCart2 className="cart-icons" /> Add to cart
                         </Button>
                       </div>
                         {selectedColor && availableQuantity > 0 && (

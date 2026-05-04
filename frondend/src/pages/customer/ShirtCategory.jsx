@@ -276,7 +276,7 @@ const ShirtCategory = () => {
                           <p>{product.description1 || 'No description available'}</p>
                         </div>
                         <Button variant="dark" className="shop-now-btn" onClick={() => navigate(`/product/${product.product_id}`)}>
-                          <BsCart2 className="cart-icon" /> Shop Now
+                          <BsCart2 className="cart-icons" /> Shop Now
                         </Button>
                       </div>
                     </div>

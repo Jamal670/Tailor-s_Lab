@@ -426,7 +426,8 @@ body {
   background-color: #222222;
 }
 
-.cart-icon {
+.cart-icons {
+  margin-top: 0.1px;
   font-size: 1.2rem;
 }
 

@@ -5,8 +5,8 @@ const transporter = nodemailer.createTransport({
   service: "gmail",
   port: 587,
   auth: {
-    user: "noreplyrizydra@gmail.com",
-    pass: "fkoiwnldvdenlhpy",
+    user: "noreplytailorslab@gmail.com",
+    pass: "hpifjmhexdaaagbt",
   },
 });
 
@@ -18,7 +18,7 @@ const generateProductCode = () => {
 // Function to generate tracking ID (format: TL-YYYYMMDD-XXXXXX)
 const generateTrackingId = () => {
   const date = new Date();
-  const dateStr = date.toISOString().slice(0, 10).replace(/-/g, '');
+  const dateStr = date.toISOString().slice(0, 10).replace(/-/g, "");
   const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
   return `TL-${dateStr}-${randomStr}`;
 };
@@ -26,7 +26,7 @@ const generateTrackingId = () => {
 //--------------------------------- User account update mail-----------------------------
 const MailToAdminOrder = async ({ name, email, date }) => {
   const mailOptions = {
-    from: "noreplyrizydra@gmail.com",
+    from: "noreplytailorslab@gmail.com",
     to: email,
     subject: "New Order Notification - Tailor",
     html: `
@@ -76,26 +76,39 @@ const MailToAdminOrder = async ({ name, email, date }) => {
     const info = await transporter.sendMail(mailOptions);
     return { success: true, message: "Account update email sent", info };
   } catch (err) {
-    return { success: false, message: "Failed to send account update email", error: err };
+    return {
+      success: false,
+      message: "Failed to send account update email",
+      error: err,
+    };
   }
 };
 
 // -------------------- Send Order Email to Admin --------------------
-const sendOrderEmailToAdmin = async ({ trackingId, orderData, customerData, items }) => {
-  const adminEmail = "jamalobaid2@gmail.com";
-  
-  const itemsTableRows = items.map(item => `
+const sendOrderEmailToAdmin = async ({
+  trackingId,
+  orderData,
+  customerData,
+  items,
+}) => {
+  const adminEmail = "noreplytailorslab@gmail.com";
+
+  const itemsTableRows = items
+    .map(
+      (item) => `
     <tr style="border-bottom: 1px solid #eee;">
-      <td style="padding: 12px; text-align: left;">${item.name || 'N/A'}</td>
-      <td style="padding: 12px; text-align: center;">${item.size || 'N/A'}</td>
-      <td style="padding: 12px; text-align: center;">${item.color || 'N/A'}</td>
+      <td style="padding: 12px; text-align: left;">${item.name || "N/A"}</td>
+      <td style="padding: 12px; text-align: center;">${item.size || "N/A"}</td>
+      <td style="padding: 12px; text-align: center;">${item.color || "N/A"}</td>
       <td style="padding: 12px; text-align: center;">${item.quantity || 0}</td>
-      <td style="padding: 12px; text-align: center;">${item.pro_code || 'N/A'}</td>
+      <td style="padding: 12px; text-align: center;">${item.pro_code || "N/A"}</td>
     </tr>
-  `).join('');
+  `,
+    )
+    .join("");
 
   const mailOptions = {
-    from: "noreplyrizydra@gmail.com",
+    from: "noreplytailorslab@gmail.com",
     to: adminEmail,
     subject: `New Order Received – Tracking ID: ${trackingId}`,
     html: `
@@ -113,39 +126,39 @@ const sendOrderEmailToAdmin = async ({ trackingId, orderData, customerData, item
             <table style="width: 100%; border-collapse: collapse;">
               <tr>
                 <td style="padding: 8px 0; font-weight: 600; color: #555; width: 40%;">First Name:</td>
-                <td style="padding: 8px 0; color: #333;">${customerData.firstName || 'N/A'}</td>
+                <td style="padding: 8px 0; color: #333;">${customerData.firstName || "N/A"}</td>
               </tr>
               <tr>
                 <td style="padding: 8px 0; font-weight: 600; color: #555;">Last Name:</td>
-                <td style="padding: 8px 0; color: #333;">${customerData.lastName || 'N/A'}</td>
+                <td style="padding: 8px 0; color: #333;">${customerData.lastName || "N/A"}</td>
               </tr>
               <tr>
                 <td style="padding: 8px 0; font-weight: 600; color: #555;">Phone Number:</td>
-                <td style="padding: 8px 0; color: #333;">${customerData.phone || 'N/A'}</td>
+                <td style="padding: 8px 0; color: #333;">${customerData.phone || "N/A"}</td>
               </tr>
               <tr>
                 <td style="padding: 8px 0; font-weight: 600; color: #555;">Email Address:</td>
-                <td style="padding: 8px 0; color: #333;">${customerData.email || 'N/A'}</td>
+                <td style="padding: 8px 0; color: #333;">${customerData.email || "N/A"}</td>
               </tr>
               <tr>
                 <td style="padding: 8px 0; font-weight: 600; color: #555;">Street Address:</td>
-                <td style="padding: 8px 0; color: #333;">${customerData.streetAddress || 'N/A'}</td>
+                <td style="padding: 8px 0; color: #333;">${customerData.streetAddress || "N/A"}</td>
               </tr>
               <tr>
                 <td style="padding: 8px 0; font-weight: 600; color: #555;">City:</td>
-                <td style="padding: 8px 0; color: #333;">${customerData.city || 'N/A'}</td>
+                <td style="padding: 8px 0; color: #333;">${customerData.city || "N/A"}</td>
               </tr>
               <tr>
                 <td style="padding: 8px 0; font-weight: 600; color: #555;">Country:</td>
-                <td style="padding: 8px 0; color: #333;">${customerData.country || 'N/A'}</td>
+                <td style="padding: 8px 0; color: #333;">${customerData.country || "N/A"}</td>
               </tr>
               <tr>
                 <td style="padding: 8px 0; font-weight: 600; color: #555;">Zip Code:</td>
-                <td style="padding: 8px 0; color: #333;">${customerData.zipcode || 'N/A'}</td>
+                <td style="padding: 8px 0; color: #333;">${customerData.zipcode || "N/A"}</td>
               </tr>
               <tr>
                 <td style="padding: 8px 0; font-weight: 600; color: #555;">Payment Method:</td>
-                <td style="padding: 8px 0; color: #333;">${customerData.paymentMethod || 'N/A'}</td>
+                <td style="padding: 8px 0; color: #333;">${customerData.paymentMethod || "N/A"}</td>
               </tr>
             </table>
           </div>
@@ -188,23 +201,36 @@ const sendOrderEmailToAdmin = async ({ trackingId, orderData, customerData, item
     return { success: true, message: "Admin order email sent", info };
   } catch (err) {
     console.error("Admin Email Error:", err);
-    return { success: false, message: "Failed to send admin order email", error: err };
+    return {
+      success: false,
+      message: "Failed to send admin order email",
+      error: err,
+    };
   }
 };
 
 // -------------------- Send Order Confirmation Email to Customer --------------------
-const sendOrderEmailToCustomer = async ({ trackingId, customerEmail, items, totalAmount }) => {
-  const itemsTableRows = items.map(item => `
+const sendOrderEmailToCustomer = async ({
+  trackingId,
+  customerEmail,
+  items,
+  totalAmount,
+}) => {
+  const itemsTableRows = items
+    .map(
+      (item) => `
     <tr style="border-bottom: 1px solid #eee;">
-      <td style="padding: 12px; text-align: left;">${item.name || 'N/A'}</td>
-      <td style="padding: 12px; text-align: center;">${item.size || 'N/A'}</td>
-      <td style="padding: 12px; text-align: center;">${item.color || 'N/A'}</td>
+      <td style="padding: 12px; text-align: left;">${item.name || "N/A"}</td>
+      <td style="padding: 12px; text-align: center;">${item.size || "N/A"}</td>
+      <td style="padding: 12px; text-align: center;">${item.color || "N/A"}</td>
       <td style="padding: 12px; text-align: center;">${item.quantity || 0}</td>
     </tr>
-  `).join('');
+  `,
+    )
+    .join("");
 
   const mailOptions = {
-    from: "noreplyrizydra@gmail.com",
+    from: "noreplytailorslab@gmail.com",
     to: customerEmail,
     subject: `Your Order Confirmation – Tracking ID: ${trackingId}`,
     html: `
@@ -262,7 +288,48 @@ const sendOrderEmailToCustomer = async ({ trackingId, customerEmail, items, tota
     return { success: true, message: "Customer order email sent", info };
   } catch (err) {
     console.error("Customer Email Error:", err);
-    return { success: false, message: "Failed to send customer order email", error: err };
+    return {
+      success: false,
+      message: "Failed to send customer order email",
+      error: err,
+    };
+  }
+};
+
+// -------------------- Send Contact Us Email to Admin --------------------
+const sendContactEmailToAdmin = async (contactData) => {
+  const adminEmail = "noreplytailorslab@gmail.com";
+
+  const mailOptions = {
+    from: "noreplytailorslab@gmail.com",
+    to: adminEmail,
+    subject: `New Contact Request from ${contactData.name}`,
+    html: `
+      <div style="font-family: 'Segoe UI', Arial, sans-serif; background: #f7f9fc; padding: 20px;">
+        <div style="max-width: 600px; margin: auto; background: #fff; border-radius: 10px; padding: 30px; box-shadow: 0 3px 10px rgba(0,0,0,0.08);">
+          <h2 style="color: #2b6cb0; text-align: center; margin-bottom: 20px;">📩 New Contact Request</h2>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr><td style="padding: 8px 0; font-weight: 600; width: 30%;">Name:</td><td style="padding: 8px 0;">${contactData.name}</td></tr>
+            <tr><td style="padding: 8px 0; font-weight: 600;">Email:</td><td style="padding: 8px 0;">${contactData.email}</td></tr>
+            <tr><td style="padding: 8px 0; font-weight: 600;">Phone:</td><td style="padding: 8px 0;">${contactData.phone || "N/A"}</td></tr>
+            <tr><td style="padding: 8px 0; font-weight: 600;">Company:</td><td style="padding: 8px 0;">${contactData.company || "N/A"}</td></tr>
+            <tr><td style="padding: 8px 0; font-weight: 600;">Message:</td><td style="padding: 8px 0;">${contactData.message}</td></tr>
+          </table>
+        </div>
+      </div>
+    `,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    return { success: true, message: "Contact email sent", info };
+  } catch (err) {
+    console.error("Contact Email Error:", err);
+    return {
+      success: false,
+      message: "Failed to send contact email",
+      error: err,
+    };
   }
 };
 
@@ -272,4 +339,5 @@ module.exports = {
   MailToAdminOrder,
   sendOrderEmailToAdmin,
   sendOrderEmailToCustomer,
+  sendContactEmailToAdmin,
 };
